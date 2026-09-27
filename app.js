@@ -519,7 +519,7 @@ document.querySelectorAll('dialog').forEach((d) => {
 /* ================= التوجيه ================= */
 const VIEWS = {
   demo: { el: 'demoView', title: 'مؤكّد | من استفسار واتساب إلى موعد مدفوع',
-    nav: [['#client', 'واجهة العميل'], ['#office', 'لوحة المكتب']] },
+    nav: [] },
   client: { el: 'clientView', title: 'مكتب أُفق للمحاماة | حجز استشارة', nav: [] },
   office: { el: 'officeView', title: 'لوحة المكتب | مؤكد',
     nav: [['#demo', 'عرض المنتج'], ['#client', 'واجهة العميل']] }

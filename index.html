@@ -10,7 +10,7 @@
   <title>مؤكّد | من استفسار واتساب إلى موعد مدفوع</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -173,48 +173,36 @@
   <!-- ============ عرض المنتج للمحامي ============ -->
   <main id="demoView" hidden>
     <section class="pitch" aria-labelledby="pitchTitle">
-      <p class="eyebrow">مؤكّد · للمحامين ومكاتب المحاماة الفردية</p>
-      <h1 id="pitchTitle">حوّل استفسارات واتساب إلى استشارات مدفوعة</h1>
-      <p class="pitch-lead">أرسل رابطك لأي مستفسر. يجاوب على أسئلة فرز قصيرة، يدفع قبل الموعد، وتتابع اللي بدأوا وما كملوا.</p>
+      <p class="eyebrow">مؤكّد للمحامين</p>
+      <h1 id="pitchTitle">خلّ كل استشارة تبدأ بالدفع</h1>
+      <p class="pitch-lead">أرسل رابطك للمستفسر. يوضح طلبه، يختار موعده، ويدفع قبل التأكيد.</p>
       <ol class="pitch-steps">
-        <li><b>1</b><span>أرسل الرابط للمستفسر.</span></li>
-        <li><b>2</b><span>العميل يفرز طلبه ويدفع.</span></li>
-        <li><b>3</b><span>تابع الطلبات والدخل من لوحة المكتب.</span></li>
+        <li><b aria-hidden="true">✓</b><span>أسئلة قصيرة حسب نوع القضية</span></li>
+        <li><b aria-hidden="true">✓</b><span>الدفع قبل تأكيد الموعد</span></li>
+        <li><b aria-hidden="true">✓</b><span>متابعة اللي بدأوا وما كملوا</span></li>
       </ol>
       <div class="pitch-actions">
-        <a class="primary" href="#client">شاهد تجربة العميل</a>
-        <a class="secondary" href="#office">افتح لوحة المكتب</a>
+        <a class="primary" href="#client">جرّب الرابط كعميل</a>
+        <a class="quiet-link" href="#office">شاهد لوحة المكتب</a>
       </div>
     </section>
 
-    <div class="pitch-grid">
-      <section class="pitch-card" aria-labelledby="prevTitle">
-        <h2 id="prevTitle">هذا ما يراه عميلك</h2>
-        <div class="client-preview" aria-hidden="true">
-          <div class="cp-head"><span class="avatar sm">ف</span><div><b>أ. فيصل الراشد</b><small>رخصة محاماة رقم 000000</small></div></div>
-          <div class="cp-facts"><span><small>القيمة</small><b>250 ر.س</b></span><span><small>المدة</small><b>30 دقيقة</b></span></div>
-          <p>الدفع مطلوب لتأكيد الموعد.</p>
-          <span class="cp-btn">ابدأ حجز الاستشارة</span>
-        </div>
-        <a class="linklike" href="#client">افتح رحلة العميل كاملة</a>
-      </section>
-
-      <section class="pitch-card" aria-labelledby="resTitle">
-        <h2 id="resTitle">نتائج أسبوعين <span class="demo-badge">بيانات تجريبية</span></h2>
+    <div class="pitch-grid simple">
+      <section class="pitch-card result-card" aria-labelledby="resTitle">
+        <h2 id="resTitle">كل شيء واضح للمكتب <span class="demo-badge">مثال تجريبي</span></h2>
         <dl class="mini-stats">
           <div><dt>فتحوا الرابط</dt><dd id="dmOpens"></dd></div>
           <div><dt>بدأوا الطلب</dt><dd id="dmStarted"></dd></div>
           <div><dt>دفعوا</dt><dd id="dmPaid"></dd></div>
           <div class="money"><dt>دخل من الرابط</dt><dd id="dmRevenue"></dd></div>
         </dl>
-        <p class="hint">الأرقام توضيحية لشرح طريقة القياس، وليست نتائج فعلية.</p>
       </section>
     </div>
 
     <section class="trial" aria-labelledby="trialTitle">
       <div>
         <h2 id="trialTitle">اختبار 14 يومًا</h2>
-        <p>جهّز رابطك باسمك وسعرك، وأرسله لكل مستفسر جديد لمدة 14 يومًا. إذا ما ساعدك على تحصيل قيمة الاستشارة قبل الموعد، توقف بدون التزام.</p>
+        <p>رابط باسمك وسعرك. جرّبه مع عملائك 14 يومًا بدون التزام.</p>
       </div>
       <button type="button" class="primary" data-open="trialDialog">ابدأ تجربة المكتب</button>
     </section>
