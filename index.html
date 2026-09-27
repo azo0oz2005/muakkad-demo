@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="مؤكّد: حوّل استفسارات واتساب إلى استشارات مدفوعة ومواعيد مؤكدة.">
+  <meta property="og:title" content="مؤكّد | من استفسار واتساب إلى موعد مدفوع">
+  <meta property="og:description" content="رابط باسم مكتبك يفرز الطلب، يحصّل قيمة الاستشارة، ويتابع من بدأ ولم يكمل.">
+  <meta property="og:type" content="website">
+  <title>مؤكّد | من استفسار واتساب إلى موعد مدفوع</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" id="brandLink" href="#demo" aria-label="مؤكّد — عرض المنتج">
+      <span class="brand-mark" id="brandMark" aria-hidden="true">م</span>
+      <span><strong id="brandName">مؤكّد</strong><small id="brandTagline">من استفسار واتساب إلى موعد مدفوع</small></span>
+    </a>
+    <nav class="top-nav" id="topNav" aria-label="التنقل بين الأوضاع"></nav>
+  </header>
+
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <!-- ============ واجهة العميل ============ -->
+  <main id="clientView">
+    <section class="offer" aria-labelledby="offerTitle">
+      <div class="offer-who">
+        <span class="avatar" aria-hidden="true">ف</span>
+        <div>
+          <p class="eyebrow">استشارة هاتفية مدفوعة</p>
+          <h1 id="offerTitle">أ. فيصل الراشد <span class="tag">اسم تجريبي</span></h1>
+          <p class="license">رخصة محاماة رقم 000000 <span>(رقم تجريبي)</span></p>
+          <ul class="offer-points">
+            <li>مكالمة هاتفية في الموعد المحدد</li>
+            <li>بدون إنشاء حساب</li>
+          </ul>
+        </div>
+      </div>
+      <div class="offer-box">
+        <dl class="offer-facts">
+          <div><dt>القيمة</dt><dd>250 <small>ر.س</small></dd></div>
+          <div><dt>المدة</dt><dd>30 <small>دقيقة</small></dd></div>
+        </dl>
+        <p class="pay-note"><b>الدفع مطلوب لتأكيد الموعد.</b> الأسئلة القانونية تُناقش خلال موعد الاستشارة.</p>
+        <button type="button" class="primary" id="startBtn">ابدأ حجز الاستشارة</button>
+        <p class="pay-methods" aria-label="طرق الدفع">مدى · Apple Pay · بطاقة ائتمانية</p>
+      </div>
+    </section>
+
+    <h2 class="form-title" id="formTitle">احجز استشارتك خلال دقيقتين</h2>
+    <section class="workspace" id="workspace" aria-labelledby="formTitle">
+      <div class="form-panel">
+        <div class="progress-wrap">
+          <div class="progress-copy"><span id="stepLabel">الخطوة 1 من 5</span><span id="stepName">نوع القضية</span></div>
+          <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+
+        <form id="intakeForm" novalidate>
+          <!-- 1 -->
+          <section class="step active" data-step="1" aria-labelledby="h1s">
+            <h2 id="h1s" tabindex="-1">إيش نوع القضية؟</h2>
+            <p class="hint">اختر الأقرب لموضوعك.</p>
+            <fieldset class="case-grid" aria-describedby="typeError">
+              <legend class="sr-only">نوع القضية</legend>
+              <label class="case-card"><input type="radio" name="caseType" value="labor"><b>عمالية</b><small>فصل، مستحقات، عقد عمل</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="enforcement"><b>تنفيذ ومطالبات</b><small>سندات، ديون، تحصيل</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="commercial"><b>تجارية</b><small>عقود، توريد، شراكات</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="realestate"><b>عقارية</b><small>إيجار، إخلاء، ملكية</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="family"><b>أحوال شخصية</b><small>نفقة، حضانة، تركات</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="other"><b>أخرى</b><small>موضوع غير موجود بالقائمة</small></label>
+            </fieldset>
+            <p class="error" id="typeError" role="alert"></p>
+          </section>
+
+          <!-- 2 -->
+          <section class="step" data-step="2" aria-labelledby="h2s">
+            <h2 id="h2s" tabindex="-1">أسئلة فرز سريعة</h2>
+            <p class="hint">اختيارات قصيرة تساعد المحامي يجهز للاستشارة.</p>
+            <div id="screening"></div>
+            <label class="field" for="caseDetails"><span>ملخص مختصر <em>(اختياري)</em></span>
+              <textarea id="caseDetails" rows="3" maxlength="300" aria-describedby="sensitiveNote charHint" placeholder="مثال: انتهى عقدي قبل شهرين ولم أستلم مكافأة نهاية الخدمة."></textarea>
+              <small id="charHint"><b id="charCount">0</b> / 300</small>
+            </label>
+            <p class="notice" id="sensitiveNote">لا تكتب بيانات شخصية حساسة أو ترفع مستندات. التفاصيل الكاملة تناقش مع المحامي أثناء الاستشارة.</p>
+          </section>
+
+          <!-- 3 -->
+          <section class="step" data-step="3" aria-labelledby="h3s">
+            <h2 id="h3s" tabindex="-1">اختر الموعد</h2>
+            <p class="hint">أيام العمل من الأحد إلى الخميس. الأوقات تجريبية.</p>
+            <div class="days" id="days" role="group" aria-label="اليوم" aria-describedby="dayError"></div>
+            <p class="error" id="dayError" role="alert"></p>
+            <fieldset class="times" aria-describedby="timeError">
+              <legend class="sr-only">الوقت</legend>
+              <label><input type="radio" name="time" value="10:00 ص"><span>10:00 ص</span></label>
+              <label><input type="radio" name="time" value="11:30 ص"><span>11:30 ص</span></label>
+              <label><input type="radio" name="time" value="4:00 م"><span>4:00 م</span></label>
+              <label><input type="radio" name="time" value="6:30 م"><span>6:30 م</span></label>
+            </fieldset>
+            <p class="error" id="timeError" role="alert"></p>
+            <p class="hold" id="holdNote" hidden>الموعد محفوظ لك <b id="holdTimer">15:00</b> دقيقة لإكمال الدفع.</p>
+          </section>
+
+          <!-- 4 -->
+          <section class="step" data-step="4" aria-labelledby="h4s">
+            <h2 id="h4s" tabindex="-1">بيانات التواصل</h2>
+            <p class="hint">نستخدمها لتأكيد الموعد فقط.</p>
+            <label class="field" for="name"><span>الاسم الأول</span>
+              <input id="name" type="text" autocomplete="given-name" maxlength="30" aria-describedby="nameError">
+            </label>
+            <p class="error" id="nameError" role="alert"></p>
+            <label class="field" for="phone"><span>رقم الجوال</span>
+              <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="05xxxxxxxx" aria-describedby="phoneError">
+            </label>
+            <p class="error" id="phoneError" role="alert"></p>
+            <label class="consent"><input id="consent" type="checkbox" aria-describedby="consentError"><span>أوافق على <button type="button" class="linklike" data-open="privacyDialog">سياسة الخصوصية وشروط الإلغاء</button>.</span></label>
+            <p class="error" id="consentError" role="alert"></p>
+          </section>
+
+          <!-- 5 -->
+          <section class="step" data-step="5" aria-labelledby="h5s">
+            <h2 id="h5s" tabindex="-1">الدفع لتأكيد الموعد</h2>
+            <p class="demo-warn">هذه معاينة فقط. لن يتم خصم أي مبلغ.</p>
+            <dl class="invoice">
+              <div><dt>نوع الاستشارة</dt><dd id="payType"></dd></div>
+              <div><dt>الموعد</dt><dd id="paySlot"></dd></div>
+              <div><dt>قيمة الاستشارة</dt><dd>250 ر.س</dd></div>
+              <div><dt>رسوم إضافية</dt><dd>0 ر.س</dd></div>
+              <div class="total"><dt>الإجمالي</dt><dd>250 ر.س</dd></div>
+            </dl>
+            <button type="button" class="pay" id="payBtn">الدفع التجريبي بمدى أو Apple Pay</button>
+          </section>
+
+          <!-- 6 -->
+          <section class="step success" data-step="6" aria-labelledby="h6s">
+            <div class="success-mark" aria-hidden="true">✓</div>
+            <h2 id="h6s" tabindex="-1">تم الدفع وتأكيد طلبك</h2>
+            <p class="hint">رقم الطلب التجريبي: <b id="orderId"></b></p>
+            <p class="hint" id="confirmText"></p>
+            <button type="button" class="secondary" id="lawyerMsgBtn">عرض ملخص ما وصل للمكتب</button>
+            <pre class="message-preview" id="lawyerMsg" hidden></pre>
+            <div class="success-actions">
+              <button type="button" class="restart" id="restart">تجربة طلب جديد</button>
+            </div>
+          </section>
+
+          <div class="mini-summary" id="miniSummary" hidden></div>
+
+          <div class="actions" id="actions">
+            <button type="button" class="back" id="backBtn">رجوع</button>
+            <button type="button" class="next" id="nextBtn">التالي</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="case-file" aria-label="ملخص الطلب">
+        <div class="file-tab">ملخص الطلب</div>
+        <dl>
+          <div><dt>النوع</dt><dd id="sumType">لم يُحدد</dd></div>
+          <div><dt>الموعد</dt><dd id="sumSlot">لم يُحدد</dd></div>
+          <div><dt>القيمة</dt><dd>250 ر.س</dd></div>
+        </dl>
+        <p class="file-note">يصل للمكتب: الاسم، النوع، الموعد، وحالة الدفع. لا نطلب هوية أو مستندات.</p>
+        <button type="button" class="linklike" data-open="privacyDialog">الخصوصية وسياسة الإلغاء</button>
+      </aside>
+    </section>
+  </main>
+
+  <!-- ============ عرض المنتج للمحامي ============ -->
+  <main id="demoView" hidden>
+    <section class="pitch" aria-labelledby="pitchTitle">
+      <p class="eyebrow">مؤكّد · للمحامين ومكاتب المحاماة الفردية</p>
+      <h1 id="pitchTitle">حوّل استفسارات واتساب إلى استشارات مدفوعة</h1>
+      <p class="pitch-lead">أرسل رابطك لأي مستفسر. يجاوب على أسئلة فرز قصيرة، يدفع قبل الموعد، وتتابع اللي بدأوا وما كملوا.</p>
+      <ol class="pitch-steps">
+        <li><b>1</b><span>أرسل الرابط للمستفسر.</span></li>
+        <li><b>2</b><span>العميل يفرز طلبه ويدفع.</span></li>
+        <li><b>3</b><span>تابع الطلبات والدخل من لوحة المكتب.</span></li>
+      </ol>
+      <div class="pitch-actions">
+        <a class="primary" href="#client">شاهد تجربة العميل</a>
+        <a class="secondary" href="#office">افتح لوحة المكتب</a>
+      </div>
+    </section>
+
+    <div class="pitch-grid">
+      <section class="pitch-card" aria-labelledby="prevTitle">
+        <h2 id="prevTitle">هذا ما يراه عميلك</h2>
+        <div class="client-preview" aria-hidden="true">
+          <div class="cp-head"><span class="avatar sm">ف</span><div><b>أ. فيصل الراشد</b><small>رخصة محاماة رقم 000000</small></div></div>
+          <div class="cp-facts"><span><small>القيمة</small><b>250 ر.س</b></span><span><small>المدة</small><b>30 دقيقة</b></span></div>
+          <p>الدفع مطلوب لتأكيد الموعد.</p>
+          <span class="cp-btn">ابدأ حجز الاستشارة</span>
+        </div>
+        <a class="linklike" href="#client">افتح رحلة العميل كاملة</a>
+      </section>
+
+      <section class="pitch-card" aria-labelledby="resTitle">
+        <h2 id="resTitle">نتائج أسبوعين <span class="demo-badge">بيانات تجريبية</span></h2>
+        <dl class="mini-stats">
+          <div><dt>فتحوا الرابط</dt><dd id="dmOpens"></dd></div>
+          <div><dt>بدأوا الطلب</dt><dd id="dmStarted"></dd></div>
+          <div><dt>دفعوا</dt><dd id="dmPaid"></dd></div>
+          <div class="money"><dt>دخل من الرابط</dt><dd id="dmRevenue"></dd></div>
+        </dl>
+        <p class="hint">الأرقام توضيحية لشرح طريقة القياس، وليست نتائج فعلية.</p>
+      </section>
+    </div>
+
+    <section class="trial" aria-labelledby="trialTitle">
+      <div>
+        <h2 id="trialTitle">اختبار 14 يومًا</h2>
+        <p>جهّز رابطك باسمك وسعرك، وأرسله لكل مستفسر جديد لمدة 14 يومًا. إذا ما ساعدك على تحصيل قيمة الاستشارة قبل الموعد، توقف بدون التزام.</p>
+      </div>
+      <button type="button" class="primary" data-open="trialDialog">ابدأ تجربة المكتب</button>
+    </section>
+  </main>
+
+  <!-- ============ لوحة المكتب ============ -->
+  <main id="officeView" hidden>
+    <div class="office-head">
+      <div>
+        <p class="eyebrow">لوحة المكتب التجريبية</p>
+        <h1 class="office-title">كم دخل لك من الرابط؟</h1>
+      </div>
+      <span class="demo-badge">بيانات تجريبية</span>
+    </div>
+
+    <section class="stats" aria-label="التقرير المالي">
+      <div><span>فتحوا الرابط</span><b id="stOpens"></b></div>
+      <div><span>بدأوا الطلب</span><b id="stStarted"></b></div>
+      <div><span>غير مكتملة</span><b id="stIncomplete"></b></div>
+      <div><span>استشارات مدفوعة</span><b id="stPaid"></b></div>
+      <div class="money"><span>إجمالي الدخل</span><b id="stRevenue"></b></div>
+      <div><span>التحول إلى دفع</span><b id="stRate"></b><small>من بداية الطلب</small></div>
+    </section>
+
+    <div class="board">
+      <section aria-labelledby="incTitle">
+        <h2 id="incTitle">طلبات غير مكتملة <span class="count" id="incCount"></span></h2>
+        <p class="hint">بدأوا الحجز وما دفعوا. تابعهم برسالة جاهزة.</p>
+        <div id="incompleteList" class="cards"></div>
+      </section>
+      <section aria-labelledby="paidTitle">
+        <h2 id="paidTitle">طلبات مدفوعة <span class="count" id="paidCount"></span></h2>
+        <div id="paidList" class="cards"></div>
+      </section>
+    </div>
+
+    <div class="office-foot">
+      <button type="button" class="linklike" data-open="privacyDialog">الخصوصية وسياسة الإلغاء</button>
+      <button type="button" class="danger" id="resetBtn">إعادة ضبط البيانات التجريبية</button>
+    </div>
+  </main>
+
+  <footer><strong>مؤكّد</strong><span>أُفق مكتب تجريبي، والبيانات توضيحية. لا يتم خصم أي مبلغ، ولا تمثل الصفحة استشارة قانونية.</span><button type="button" class="linklike" data-open="privacyDialog">الخصوصية وسياسة الإلغاء</button></footer>
+
+  <!-- ============ نوافذ ============ -->
+  <dialog id="privacyDialog" aria-labelledby="privTitle">
+    <h2 id="privTitle">الخصوصية وسياسة الإلغاء (نص نموذجي)</h2>
+    <h3>البيانات التي نجمعها</h3>
+    <p>الاسم الأول، رقم الجوال، نوع القضية، إجابات أسئلة الفرز، وملخص اختياري قصير.</p>
+    <h3>سبب جمعها</h3>
+    <p>تأكيد الموعد، وتجهيز المحامي للاستشارة، والتواصل بخصوص هذا الطلب فقط.</p>
+    <h3>ما لا نطلبه</h3>
+    <p>لا نطلب رقم الهوية أو رقم القضية أو أسماء الخصوم أو أي مستندات.</p>
+    <h3>مدة الاحتفاظ</h3>
+    <p>مدة تجريبية مقترحة: 30 يومًا ثم تُحذف. هذا النموذج التجريبي لا يرسل بيانات إلى أي خادم؛ كل شيء يُحفظ في متصفحك فقط.</p>
+    <h3>سياسة إلغاء نموذجية</h3>
+    <p>الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ. كل مكتب يحدد سياسته الخاصة.</p>
+    <p class="demo-warn">هذا النص للعرض فقط، وليس استشارة قانونية ولا سياسة نهائية، ولا يدّعي التوافق النظامي الكامل.</p>
+    <button type="button" class="primary" data-close>إغلاق</button>
+  </dialog>
+
+  <dialog id="msgDialog" aria-labelledby="msgTitle">
+    <h2 id="msgTitle">معاينة رسالة متابعة</h2>
+    <p class="hint">معاينة فقط — لا يتم إرسال أي رسالة.</p>
+    <pre class="message-preview" id="msgText"></pre>
+    <button type="button" class="primary" data-close>إغلاق</button>
+  </dialog>
+
+  <dialog id="trialDialog" aria-labelledby="trialDlgTitle">
+    <h2 id="trialDlgTitle">ابدأ تجربة المكتب</h2>
+    <p>هذه نسخة عرض. في النسخة الفعلية يتم تجهيز الرابط باسم المكتب وسعر الاستشارة.</p>
+    <button type="button" class="primary" data-close>حسنًا</button>
+  </dialog>
+
+  <dialog id="resetDialog" aria-labelledby="resetTitle">
+    <h2 id="resetTitle">إعادة ضبط البيانات التجريبية؟</h2>
+    <p class="hint">سيتم حذف الطلبات التي أضفتها وإرجاع الأرقام الافتراضية.</p>
+    <div class="dialog-actions">
+      <button type="button" class="danger" id="confirmReset">نعم، أعد الضبط</button>
+      <button type="button" class="secondary" data-close>إلغاء</button>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
