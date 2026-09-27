@@ -522,7 +522,7 @@ document.querySelectorAll('dialog').forEach((d) => {
 const CONTACT_WA = '966582778392';
 
 function wireWhatsApp() {
-  if (!/^9665\d{8}$/.test(CONTACT_WA)) return;
+  if (!/^9665d{8}$/.test(CONTACT_WA)) return;
   document.querySelectorAll('[data-wa-text]').forEach((a) => {
     a.removeAttribute('data-open');
     a.href = `https://wa.me/${CONTACT_WA}?text=${encodeURIComponent(a.dataset.waText)}`;
