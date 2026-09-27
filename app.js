@@ -519,7 +519,7 @@ document.querySelectorAll('dialog').forEach((d) => {
 /* ================= التواصل ================= */
 // رقم واتساب صاحب الخدمة بصيغة دولية بدون + (مثال: 9665XXXXXXXX).
 // إذا كان فارغًا تبقى الأزرار تفتح نافذة العرض التجريبية.
-const CONTACT_WA = '';
+const CONTACT_WA = '966582778392';
 
 function wireWhatsApp() {
   if (!/^9665\d{8}$/.test(CONTACT_WA)) return;
