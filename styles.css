@@ -374,3 +374,7 @@ a.primary{color:#fff}
   .brand{gap:8px}
 }
 .license span{color:var(--muted);font-size:12px}
+
+/* v4: منع انكسار المبالغ والأرقام */
+.mini-stats dd,.stats b{white-space:nowrap}
+@media (max-width:640px){.mini-stats dd{font-size:21px}}

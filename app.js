@@ -516,6 +516,24 @@ document.querySelectorAll('dialog').forEach((d) => {
   d.addEventListener('click', (e) => { if (e.target === d) closeDialog(d); });
 });
 
+/* ================= التواصل ================= */
+// رقم واتساب صاحب الخدمة بصيغة دولية بدون + (مثال: 9665XXXXXXXX).
+// إذا كان فارغًا تبقى الأزرار تفتح نافذة العرض التجريبية.
+const CONTACT_WA = '';
+
+function wireWhatsApp() {
+  if (!/^9665\d{8}$/.test(CONTACT_WA)) return;
+  document.querySelectorAll('[data-wa-text]').forEach((a) => {
+    a.removeAttribute('data-open');
+    a.href = `https://wa.me/${CONTACT_WA}?text=${encodeURIComponent(a.dataset.waText)}`;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    if (a.dataset.waLabel) a.textContent = a.dataset.waLabel;
+  });
+  $('footerWa').dataset.enabled = '1';
+}
+wireWhatsApp();
+
 /* ================= التوجيه ================= */
 const VIEWS = {
   demo: { el: 'demoView', title: 'مؤكّد | من استفسار واتساب إلى موعد مدفوع',
@@ -563,6 +581,8 @@ function route() {
   $('brandLink').setAttribute('aria-label', view === 'client' ? 'مكتب أفق للمحاماة — واجهة العميل' : 'مؤكّد — عرض المنتج');
   $('brandMark').textContent = view === 'client' ? 'أ' : 'م';
   $('brandName').textContent = view === 'client' ? 'أُفق' : 'مؤكّد';
+  $('footerBrand').textContent = view === 'client' ? 'أُفق للمحاماة · بواسطة مؤكّد' : 'مؤكّد';
+  $('footerWa').hidden = view === 'client' || !$('footerWa').dataset.enabled;
   $('brandTagline').textContent = view === 'client' ? 'للمحاماة والاستشارات القانونية' : 'من استفسار واتساب إلى موعد مدفوع';
   document.body.dataset.view = view;
   document.title = VIEWS[view].title;
