@@ -1,0 +1,42 @@
+/* هوية مكتب حمد بن عواد الشريف: كحلي + أزرق رمادي + رمادي فاتح */
+:root{
+  --ink:#1f2a4f;--ink-2:#2e3a6b;--copper:#5a6690;--copper-2:#4a5680;
+  --paper:#f3f3f1;--mist:#e3e5ec;--line:#dcdfe6;--muted:#5f6674;--focus:#8e9bd0
+}
+body{background:radial-gradient(900px 420px at 85% -80px,rgba(90,102,144,.14),transparent 70%),var(--paper)}
+
+.draft-ribbon{margin:0;padding:7px 16px;text-align:center;font-size:12px;background:#fff6e5;color:#7a4a1d;border-bottom:1px solid #efd6b6}
+
+.brand{gap:12px}
+.brand-logo{width:auto;height:46px;flex:none}
+.brand .brand-name{font-family:"Amiri",serif;font-size:21px;letter-spacing:0;color:var(--ink)}
+.brand small{font-size:11.5px}
+
+/* بطاقة العرض */
+.offer-logo{flex:none;width:auto;height:96px}
+.offer h1{font-family:"Amiri",serif;font-size:clamp(26px,3vw,34px);font-weight:700}
+.offer .license{color:var(--muted)}
+.offer-box{background:linear-gradient(160deg,#2e3a6b,#1f2a4f)}
+.offer-facts div:first-child dd{color:#dfe4f5}
+.offer-box #startBtn{background:#fff;color:var(--ink);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.offer-box #startBtn:hover{background:#e9ecf6}
+
+/* الأزرار */
+.pay,.wa-send{background:#1f7a52}
+.pay:hover,.wa-send:hover{background:#18633f}
+.case-card:has(input:checked)::after{background:var(--ink)}
+.file-tab{background:var(--ink);color:#dfe4f5}
+
+.pay-info{background:#eef1f8;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;font-size:14px}
+.pay-info p{margin:0}
+.pay-info .iban{margin-top:6px;font-weight:700;letter-spacing:.04em;text-align:left}
+.small-note{font-size:12.5px;margin-top:8px}
+
+footer .by{color:var(--muted)}
+
+@media (max-width:640px){
+  .brand-logo{height:38px}
+  .brand-name{font-size:18px}
+  .brand small{display:block;font-size:10.5px}
+  .offer-logo{height:64px}
+}

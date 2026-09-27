@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="احجز استشارة قانونية مع مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية">
+  <meta name="robots" content="noindex">
+  <title>حجز استشارة | حمد بن عواد الشريف للمحاماة</title>
+  <link rel="icon" href="logo-mark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=4">
+  <link rel="stylesheet" href="hamad.css?v=1">
+</head>
+<body>
+  <p class="draft-ribbon" id="draftRibbon">نسخة مبدئية للمراجعة — السعر والأوقات قابلة للتعديل</p>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية">
+      <img class="brand-logo" src="logo-mark.png" alt="" width="22" height="56">
+      <span><strong class="brand-name">حمد بن عواد الشريف</strong><small>للمحاماة والاستشارات القانونية</small></span>
+    </a>
+  </header>
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <main id="clientView">
+    <section class="offer" aria-labelledby="offerTitle">
+      <div class="offer-who">
+        <img class="offer-logo" src="logo-mark.png" alt="" width="40" height="102">
+        <div>
+          <p class="eyebrow">حجز استشارة قانونية</p>
+          <h1 id="offerTitle">مكتب حمد بن عواد الشريف</h1>
+          <p class="license">للمحاماة والاستشارات القانونية · المدينة المنورة</p>
+          <ul class="offer-points">
+            <li>استشارة مع محامٍ مرخّص</li>
+            <li>بدون إنشاء حساب</li>
+          </ul>
+        </div>
+      </div>
+      <div class="offer-box">
+        <dl class="offer-facts">
+          <div><dt>القيمة</dt><dd><span data-price></span> <small>ر.س</small></dd></div>
+          <div><dt>المدة</dt><dd><span data-duration></span> <small>دقيقة</small></dd></div>
+        </dl>
+        <p class="pay-note"><b>الدفع مطلوب لتأكيد الموعد.</b> الأسئلة القانونية تُناقش خلال موعد الاستشارة.</p>
+        <button type="button" class="primary" id="startBtn">ابدأ حجز الاستشارة</button>
+      </div>
+    </section>
+
+    <h2 class="form-title" id="formTitle">احجز استشارتك خلال دقيقتين</h2>
+    <section class="workspace" id="workspace" aria-labelledby="formTitle">
+      <div class="form-panel">
+        <div class="progress-wrap">
+          <div class="progress-copy"><span id="stepLabel">الخطوة 1 من 5</span><span id="stepName">نوع القضية</span></div>
+          <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+
+        <form id="intakeForm" novalidate>
+          <!-- 1 -->
+          <section class="step active" data-step="1" aria-labelledby="h1s">
+            <h2 id="h1s" tabindex="-1">إيش نوع القضية؟</h2>
+            <p class="hint">اختر الأقرب لموضوعك.</p>
+            <fieldset class="case-grid" aria-describedby="typeError">
+              <legend class="sr-only">نوع القضية</legend>
+              <label class="case-card"><input type="radio" name="caseType" value="labor"><b>عمالية</b><small>فصل، مستحقات، عقد عمل</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="enforcement"><b>تنفيذ ومطالبات</b><small>سندات، ديون، تحصيل</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="commercial"><b>تجارية</b><small>عقود، توريد، شراكات</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="realestate"><b>عقارية</b><small>إيجار، إخلاء، ملكية</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="family"><b>أحوال شخصية</b><small>نفقة، حضانة، تركات</small></label>
+              <label class="case-card"><input type="radio" name="caseType" value="other"><b>أخرى</b><small>موضوع غير موجود بالقائمة</small></label>
+            </fieldset>
+            <p class="error" id="typeError" role="alert"></p>
+          </section>
+
+          <!-- 2 -->
+          <section class="step" data-step="2" aria-labelledby="h2s">
+            <h2 id="h2s" tabindex="-1">أسئلة فرز سريعة</h2>
+            <p class="hint">اختيارات قصيرة تساعد المحامي يجهز للاستشارة.</p>
+            <div id="screening"></div>
+            <label class="field" for="caseDetails"><span>ملخص مختصر <em>(اختياري)</em></span>
+              <textarea id="caseDetails" rows="3" maxlength="300" aria-describedby="sensitiveNote charHint" placeholder="مثال: انتهى عقدي قبل شهرين ولم أستلم مكافأة نهاية الخدمة."></textarea>
+              <small id="charHint"><b id="charCount">0</b> / 300</small>
+            </label>
+            <p class="notice" id="sensitiveNote">لا تكتب بيانات شخصية حساسة أو ترسل مستندات. التفاصيل الكاملة تُناقش مع المحامي أثناء الاستشارة.</p>
+          </section>
+
+          <!-- 3 -->
+          <section class="step" data-step="3" aria-labelledby="h3s">
+            <h2 id="h3s" tabindex="-1">اختر الموعد المناسب</h2>
+            <p class="hint">أيام العمل من الأحد إلى الخميس. يؤكد المكتب الموعد بعد استلام الدفع.</p>
+            <div class="days" id="days" role="group" aria-label="اليوم" aria-describedby="dayError"></div>
+            <p class="error" id="dayError" role="alert"></p>
+            <fieldset class="times" id="times" aria-describedby="timeError">
+              <legend class="sr-only">الوقت</legend>
+            </fieldset>
+            <p class="error" id="timeError" role="alert"></p>
+          </section>
+
+          <!-- 4 -->
+          <section class="step" data-step="4" aria-labelledby="h4s">
+            <h2 id="h4s" tabindex="-1">بيانات التواصل</h2>
+            <p class="hint">يستخدمها المكتب لتأكيد الموعد فقط.</p>
+            <label class="field" for="name"><span>الاسم</span>
+              <input id="name" type="text" autocomplete="name" maxlength="40" aria-describedby="nameError">
+            </label>
+            <p class="error" id="nameError" role="alert"></p>
+            <label class="field" for="phone"><span>رقم الجوال</span>
+              <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="05xxxxxxxx" aria-describedby="phoneError">
+            </label>
+            <p class="error" id="phoneError" role="alert"></p>
+            <label class="consent"><input id="consent" type="checkbox" aria-describedby="consentError"><span>أوافق على <button type="button" class="linklike" data-open="privacyDialog">سياسة الخصوصية وشروط الإلغاء</button>.</span></label>
+            <p class="error" id="consentError" role="alert"></p>
+          </section>
+
+          <!-- 5 -->
+          <section class="step" data-step="5" aria-labelledby="h5s">
+            <h2 id="h5s" tabindex="-1">راجع طلبك وأرسله للمكتب</h2>
+            <dl class="invoice">
+              <div><dt>نوع الاستشارة</dt><dd id="revType"></dd></div>
+              <div><dt>الموعد المطلوب</dt><dd id="revSlot"></dd></div>
+              <div><dt>الاسم</dt><dd id="revName"></dd></div>
+              <div class="total"><dt>قيمة الاستشارة</dt><dd><span data-price></span> ر.س</dd></div>
+            </dl>
+            <div class="pay-info" id="payInfo"></div>
+            <button type="button" class="pay wa-send" id="sendBtn">أرسل الطلب للمكتب عبر واتساب</button>
+            <p class="hint small-note">يفتح واتساب برسالة جاهزة فيها ملخص طلبك. اضغط «إرسال» داخل واتساب لإكمال الطلب.</p>
+          </section>
+
+          <!-- 6 -->
+          <section class="step success" data-step="6" aria-labelledby="h6s">
+            <div class="success-mark" aria-hidden="true">✓</div>
+            <h2 id="h6s" tabindex="-1">تم تجهيز طلبك</h2>
+            <p class="hint">إذا ما انفتح واتساب، اضغط الزر تحت وأرسل الرسالة كما هي.</p>
+            <a class="primary" id="resendLink" href="#" target="_blank" rel="noopener">فتح واتساب مرة ثانية</a>
+            <p class="hint" style="margin-top:14px">بعد استلام الطلب يتواصل معك المكتب لتأكيد الموعد وإرسال بيانات الدفع.</p>
+            <div class="success-actions">
+              <button type="button" class="restart" id="restart">طلب جديد</button>
+            </div>
+          </section>
+
+          <div class="mini-summary" id="miniSummary" hidden></div>
+
+          <div class="actions" id="actions">
+            <button type="button" class="back" id="backBtn">رجوع</button>
+            <button type="button" class="next" id="nextBtn">التالي</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="case-file" aria-label="ملخص الطلب">
+        <div class="file-tab">ملخص الطلب</div>
+        <dl>
+          <div><dt>النوع</dt><dd id="sumType">لم يُحدد</dd></div>
+          <div><dt>الموعد</dt><dd id="sumSlot">لم يُحدد</dd></div>
+          <div><dt>القيمة</dt><dd><span data-price></span> ر.س</dd></div>
+        </dl>
+        <p class="file-note">يصل للمكتب: الاسم، رقم الجوال، نوع القضية، إجابات الفرز، والموعد المطلوب. لا نطلب هوية أو مستندات.</p>
+        <button type="button" class="linklike" data-open="privacyDialog">الخصوصية وسياسة الإلغاء</button>
+      </aside>
+    </section>
+  </main>
+
+  <footer><strong>حمد بن عواد الشريف للمحاماة والاستشارات القانونية</strong><span class="by">بواسطة مؤكّد</span><button type="button" class="linklike" data-open="privacyDialog">الخصوصية وسياسة الإلغاء</button></footer>
+
+  <dialog id="privacyDialog" aria-labelledby="privTitle">
+    <h2 id="privTitle">الخصوصية وسياسة الإلغاء</h2>
+    <h3>البيانات التي نجمعها</h3>
+    <p>الاسم، رقم الجوال، نوع القضية، إجابات أسئلة الفرز، وملخص اختياري قصير.</p>
+    <h3>سبب جمعها</h3>
+    <p>تأكيد الموعد وتجهيز المحامي للاستشارة، والتواصل بخصوص هذا الطلب فقط.</p>
+    <h3>كيف تُرسل</h3>
+    <p>لا تُحفظ بياناتك على أي خادم في هذه الصفحة. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.</p>
+    <h3>ما لا نطلبه</h3>
+    <p>لا نطلب رقم الهوية أو رقم القضية أو أسماء الخصوم أو أي مستندات.</p>
+    <h3>الإلغاء</h3>
+    <p id="cancelPolicy"></p>
+    <button type="button" class="primary" data-close>إغلاق</button>
+  </dialog>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
