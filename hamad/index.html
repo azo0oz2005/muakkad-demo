@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css?v=4">
-  <link rel="stylesheet" href="hamad.css?v=1">
+  <link rel="stylesheet" href="hamad.css?v=2">
 </head>
 <body>
   <p class="draft-ribbon" id="draftRibbon">نسخة مبدئية للمراجعة — السعر والأوقات قابلة للتعديل</p>
@@ -88,8 +88,8 @@
 
           <!-- 3 -->
           <section class="step" data-step="3" aria-labelledby="h3s">
-            <h2 id="h3s" tabindex="-1">اختر الموعد المناسب</h2>
-            <p class="hint">أيام العمل من الأحد إلى الخميس. يؤكد المكتب الموعد بعد استلام الدفع.</p>
+            <h2 id="h3s" tabindex="-1">متى يناسبك؟</h2>
+            <p class="hint">اختر اليوم والفترة المناسبة لك، ويثبت المكتب الساعة ويؤكد الموعد بعد استلام الدفع.</p>
             <div class="days" id="days" role="group" aria-label="اليوم" aria-describedby="dayError"></div>
             <p class="error" id="dayError" role="alert"></p>
             <fieldset class="times" id="times" aria-describedby="timeError">
@@ -134,7 +134,7 @@
             <h2 id="h6s" tabindex="-1">تم تجهيز طلبك</h2>
             <p class="hint">إذا ما انفتح واتساب، اضغط الزر تحت وأرسل الرسالة كما هي.</p>
             <a class="primary" id="resendLink" href="#" target="_blank" rel="noopener">فتح واتساب مرة ثانية</a>
-            <p class="hint" style="margin-top:14px">بعد استلام الطلب يتواصل معك المكتب لتأكيد الموعد وإرسال بيانات الدفع.</p>
+            <p class="hint" style="margin-top:14px">حوّل قيمة الاستشارة على الآيبان الظاهر في الخطوة السابقة، وأرسل الإيصال في نفس المحادثة ليتأكد موعدك.</p>
             <div class="success-actions">
               <button type="button" class="restart" id="restart">طلب جديد</button>
             </div>
@@ -179,6 +179,6 @@
     <button type="button" class="primary" data-close>إغلاق</button>
   </dialog>
 
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

@@ -5,15 +5,18 @@
 const OFFICE = {
   name: 'مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية',
   whatsapp: '966510090456',          // رقم استقبال الطلبات (دولي بدون +)
-  price: 250,                         // مبدئي — بانتظار سعر المكتب
-  duration: 30,                       // مبدئي — بالدقائق
-  times: ['10:00 ص', '11:30 ص', '4:00 م', '6:30 م'], // مبدئي
+  price: 250,                         // حسب المكتب
+  duration: 30,                       // بالدقائق (لم يحددها المكتب بعد)
+  // الأوقات مفتوحة حسب المكتب: العميل يختار الفترة المفضلة والمكتب يثبت الساعة
+  times: ['صباحًا (9–12)', 'ظهرًا (12–4)', 'مساءً (4–9)', 'أي وقت'],
+  allDays: true,                      // كل أيام الأسبوع
   // طريقة الدفع: اترك الاثنين فارغين حتى يرسلها المكتب
   payLink: '',                        // رابط دفع (ميسر / Paylink / Tap)
-  iban: '',                           // أو آيبان للتحويل البنكي
-  bankName: '',
+  iban: 'SA5536031016043771844027',   // تحويل بنكي
+  bankName: 'بنك D360',
+  accountName: 'حمد عواد الشريف',
   cancelPolicy: 'الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ.',
-  draft: true                         // يُظهر شريط «نسخة مبدئية» — اجعله false عند التسليم
+  draft: false                        // يُظهر شريط «نسخة مبدئية» — اجعله false عند التسليم
 };
 
 const DAY_NAMES = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
@@ -92,7 +95,7 @@ function workingDays(from, count) {
   while (out.length < count) {
     d.setDate(d.getDate() + 1);
     const wd = d.getDay();
-    if (wd === 5 || wd === 6) continue;
+    if (!OFFICE.allDays && (wd === 5 || wd === 6)) continue;
     out.push({ weekday: DAY_NAMES[wd], day: d.getDate(), month: MONTHS[d.getMonth()] });
   }
   return out;
@@ -111,11 +114,22 @@ function payInfoHtml() {
     return `<p><b>الدفع:</b> بعد إرسال الطلب، ادفع قيمة الاستشارة من <a href="${OFFICE.payLink}" target="_blank" rel="noopener">رابط الدفع</a> (مدى / Apple Pay) ليتأكد موعدك.</p>`;
   }
   if (OFFICE.iban) {
-    return `<p><b>الدفع:</b> حوّل قيمة الاستشارة إلى حساب المكتب${OFFICE.bankName ? ` في ${OFFICE.bankName}` : ''}، ويتأكد موعدك بعد استلام الحوالة.</p><p class="iban" dir="ltr">${OFFICE.iban}</p>`;
+    return `<p><b>الدفع بتحويل بنكي:</b> حوّل ${OFFICE.price} ر.س إلى حساب المكتب، ويتأكد موعدك بعد وصول الحوالة.</p>
+      <dl class="bank">
+        <div><dt>البنك</dt><dd>${OFFICE.bankName}</dd></div>
+        <div><dt>اسم المستفيد</dt><dd>${OFFICE.accountName}</dd></div>
+        <div><dt>الآيبان</dt><dd class="iban" dir="ltr">${OFFICE.iban}</dd></div>
+      </dl>
+      <button type="button" class="secondary small" id="copyIban">نسخ الآيبان</button>`;
   }
   return '<p><b>الدفع:</b> بعد استلام طلبك يرسل لك المكتب طريقة الدفع، ويتأكد موعدك بعد استلام قيمة الاستشارة.</p>';
 }
 $('payInfo').innerHTML = payInfoHtml();
+$('payInfo').addEventListener('click', async (e) => {
+  if (e.target.id !== 'copyIban') return;
+  try { await navigator.clipboard.writeText(OFFICE.iban); e.target.textContent = 'تم النسخ ✓'; }
+  catch (err) { e.target.textContent = OFFICE.iban; }
+});
 
 /* ================= حالة الرحلة ================= */
 const form = $('intakeForm');
@@ -140,7 +154,7 @@ function renderScreening() {
 function renderDays() {
   const box = $('days');
   box.innerHTML = '';
-  workingDays(new Date(), 5).forEach((d) => {
+  workingDays(new Date(), OFFICE.allDays ? 7 : 5).forEach((d) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'day';
@@ -219,7 +233,7 @@ function buildMessage() {
     answers,
     summary ? `\nملخص: ${summary}` : '',
     '',
-    `(قيمة الاستشارة ${OFFICE.price} ر.س — بانتظار تأكيد الموعد وطريقة الدفع)`
+    `(قيمة الاستشارة ${OFFICE.price} ر.س — سأحوّلها على الآيبان وأرسل الإيصال هنا)`
   ].filter((l) => l !== null).join('\n').replace(/\n{3,}/g, '\n\n');
 }
 

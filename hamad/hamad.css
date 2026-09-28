@@ -40,3 +40,11 @@ footer .by{color:var(--muted)}
   .brand small{display:block;font-size:10.5px}
   .offer-logo{height:64px}
 }
+
+.pay-info .bank{margin:10px 0;display:grid;gap:4px}
+.pay-info .bank div{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}
+.pay-info .bank dt{color:var(--muted)}
+.pay-info .bank dd{margin:0;font-weight:600}
+.days{grid-template-columns:repeat(7,minmax(0,1fr))}
+.times span{white-space:nowrap}
+@media (max-width:640px){.days{grid-template-columns:repeat(4,minmax(0,1fr))}}
