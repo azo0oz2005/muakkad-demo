@@ -17,11 +17,11 @@ const caseTypes = {
       VALUES
         ('hamad','مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية','/hamad/logo-mark.png',
          '{"ink":"#1f2a4f","accent":"#5a6690"}'::jsonb,'966510090456',250,30,
-         '["صباحًا (9–12)","ظهرًا (12–4)","مساءً (4–9)","أي وقت"]'::jsonb,TRUE,$1,
+         '["صباحًا (9–12)","ظهرًا (12–4)","مساءً (4–9)","أي وقت"]'::jsonb,FALSE,$1,
          'بنك D360','حمد عواد الشريف','SA5536031016043771844027',
          'الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ.',
          NOW() + INTERVAL '14 days','trial')
-      ON CONFLICT (slug) DO UPDATE SET updated_at=NOW()
+      ON CONFLICT (slug) DO UPDATE SET all_days=EXCLUDED.all_days, updated_at=NOW()
       RETURNING id`, [JSON.stringify(caseTypes)]);
 
     const officeId = office.rows[0].id;

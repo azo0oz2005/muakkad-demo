@@ -173,8 +173,13 @@ app.patch('/api/public/:slug/progress', async (req, res) => {
   const id = String(req.body.bookingId || '');
   const sessionHash = cleanText(req.body.sessionHash, 80);
   const step = Math.max(1, Math.min(6, Number(req.body.step) || 1));
+  const clientName = cleanText(req.body.clientName, 60);
+  const clientPhone = normalizePhone(req.body.clientPhone);
   if (!office || !id || sessionHash.length < 12) return res.status(400).json({ error: 'طلب غير صالح.' });
-  await query("UPDATE bookings SET last_step=GREATEST(last_step,$1),updated_at=NOW() WHERE id=$2 AND office_id=$3 AND session_hash=$4 AND status='started'", [step, id, office.id, sessionHash]);
+  await query(`UPDATE bookings SET last_step=GREATEST(last_step,$1),
+    client_name=COALESCE($2,client_name), client_phone=COALESCE($3,client_phone), updated_at=NOW()
+    WHERE id=$4 AND office_id=$5 AND session_hash=$6 AND status='started'`,
+    [step, clientName.length >= 2 ? clientName : null, clientPhone || null, id, office.id, sessionHash]);
   await query("INSERT INTO events (office_id,type,step,session_hash) VALUES ($1,'step_reached',$2,$3)", [office.id, step, sessionHash]);
   res.status(204).end();
 });

@@ -282,7 +282,8 @@ function render(focus = true) {
   }
   updateSummary();
   if (window.__OFFICE__ && bookingId && current > 1 && current <= 5) {
-    api('/progress', { method:'PATCH', body:JSON.stringify({ bookingId, sessionHash, step:current }) }).catch(() => {});
+    const contact = current >= 5 ? { clientName:$('name').value.trim(), clientPhone:$('phone').value } : {};
+    api('/progress', { method:'PATCH', body:JSON.stringify({ bookingId, sessionHash, step:current, ...contact }) }).catch(() => {});
   }
   if (focus) {
     const h = document.querySelector('.step.active h2');
