@@ -329,7 +329,7 @@ app.patch('/api/admin/offices/:id/status', requireAuth('owner_admin'), requireCs
 });
 
 app.get('/:slug', async (req, res, next) => {
-  if (['api','platform','hamad'].includes(req.params.slug)) return next();
+  if (['api','platform'].includes(req.params.slug)) return next();
   const office = await loadOffice(req.params.slug);
   if (!office) return res.status(404).send('المكتب غير موجود');
   if (!office.active || office.plan_status === 'paused') return res.status(503).send('<main dir="rtl" style="font-family:system-ui;max-width:600px;margin:15vh auto;padding:24px"><h1>الحجز متوقف مؤقتًا</h1><p>تواصل مع المكتب مباشرة، ونعتذر عن الإزعاج.</p></main>');
