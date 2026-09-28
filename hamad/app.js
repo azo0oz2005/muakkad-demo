@@ -16,7 +16,9 @@ const OFFICE = {
   bankName: 'بنك D360',
   accountName: 'حمد عواد الشريف',
   cancelPolicy: 'الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ.',
-  draft: false                        // يُظهر شريط «نسخة مبدئية» — اجعله false عند التسليم
+  draft: false,
+  // إحصاءات الزوار (GoatCounter): اسم الحساب فقط، مثل 'muakkad'. فارغ = بدون إحصاء
+  goatcounter: ''                        // يُظهر شريط «نسخة مبدئية» — اجعله false عند التسليم
 };
 
 const DAY_NAMES = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
@@ -130,6 +132,22 @@ $('payInfo').addEventListener('click', async (e) => {
   try { await navigator.clipboard.writeText(OFFICE.iban); e.target.textContent = 'تم النسخ ✓'; }
   catch (err) { e.target.textContent = OFFICE.iban; }
 });
+
+/* ================= إحصاءات (بدون كوكيز ولا بيانات شخصية) ================= */
+const PAGE_KEY = 'hamad';
+function track(event) {
+  if (!OFFICE.goatcounter || !window.goatcounter || !window.goatcounter.count) return;
+  window.goatcounter.count({ path: `${PAGE_KEY}/${event}`, title: event, event: true });
+}
+if (OFFICE.goatcounter) {
+  window.goatcounter = { path: () => `${PAGE_KEY}/visit` };
+  const gc = document.createElement('script');
+  gc.async = true;
+  gc.src = '//gc.zgo.at/count.js';
+  gc.dataset.goatcounter = `https://${OFFICE.goatcounter}.goatcounter.com/count`;
+  document.head.appendChild(gc);
+}
+let startedTracked = false;
 
 /* ================= حالة الرحلة ================= */
 const form = $('intakeForm');
@@ -294,6 +312,7 @@ $('nextBtn').addEventListener('click', () => { if (validate()) { current += 1; r
 $('backBtn').addEventListener('click', () => { if (current > 1) { current -= 1; render(); } });
 $('sendBtn').addEventListener('click', () => {
   const url = waUrl();
+  track('sent');
   $('resendLink').href = url;
   window.open(url, '_blank', 'noopener');
   current = 6;
@@ -302,7 +321,11 @@ $('sendBtn').addEventListener('click', () => {
 $('restart').addEventListener('click', resetForm);
 
 form.addEventListener('change', (e) => {
-  if (e.target.name === 'caseType') { renderScreening(); setError('typeError', ''); }
+  if (e.target.name === 'caseType') {
+    renderScreening();
+    setError('typeError', '');
+    if (!startedTracked) { startedTracked = true; track('started'); }
+  }
   if (e.target.name === 'time') setError('timeError', '');
   if (e.target.name && e.target.name.startsWith('q-')) setError('err-' + e.target.name.slice(2), '');
   if (e.target.id === 'consent' && e.target.checked) setError('consentError', '');
