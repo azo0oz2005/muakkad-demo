@@ -347,7 +347,7 @@ app.get('/:slug', async (req, res, next) => {
     .replaceAll('logo-mark.png', office.logo_url || '/hamad/logo-mark.png')
     .replace('href="../styles.css?v=4"','href="/styles.css?v=5"')
     .replace('href="hamad.css?v=2"','href="/hamad/hamad.css?v=3"')
-    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=4"></script>`)
+    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=5"></script>`)
     .replace('لا تُحفظ بياناتك على أي خادم في هذه الصفحة، ونستخدم إحصاءً مجهولًا لعدد الزيارات فقط بدون كوكيز. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.', 'تُحفظ بيانات الطلب بأقل قدر لازم لتأكيد الاستشارة ومتابعتها، ثم تُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع.')
     .replace('</form>', '<label class="sr-only">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>');
   res.type('html').send(html);
