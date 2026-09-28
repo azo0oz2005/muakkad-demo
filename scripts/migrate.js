@@ -74,9 +74,25 @@ CREATE INDEX IF NOT EXISTS bookings_session_idx ON bookings(office_id, session_h
 CREATE INDEX IF NOT EXISTS events_office_created_idx ON events(office_id, created_at DESC);
 `;
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function migrateWithRetry(maxAttempts = 12) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await pool.query(sql);
+      return;
+    } catch (error) {
+      const retryable = ['ECONNREFUSED', 'ETIMEDOUT', 'ENETUNREACH'].includes(error.code);
+      if (!retryable || attempt === maxAttempts) throw error;
+      console.warn(`Database not ready (attempt ${attempt}/${maxAttempts}); retrying in 5s`);
+      await wait(5000);
+    }
+  }
+}
+
 (async () => {
   try {
-    await pool.query(sql);
+    await migrateWithRetry();
     console.log('Database migrated');
   } finally {
     await pool.end();
