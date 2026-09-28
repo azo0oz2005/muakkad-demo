@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: muakkad-platform
+    runtime: node
+    region: frankfurt
+    plan: 0.5c-512mb
+    buildCommand: npm ci
+    preDeployCommand: npm run migrate && npm run seed
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: muakkad-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: HAMAD_EMAIL
+        sync: false
+      - key: HAMAD_PASSWORD_HASH
+        sync: false
+
+  - type: cron
+    name: muakkad-retention-cleanup
+    runtime: node
+    region: frankfurt
+    plan: 0.5c-512mb
+    schedule: "15 2 * * *"
+    buildCommand: npm ci
+    startCommand: npm run cleanup
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: muakkad-db
+          property: connectionString
+
+databases:
+  - name: muakkad-db
+    region: frankfurt
+    plan: basic-256mb
+    databaseName: muakkad
+    user: muakkad
+    ipAllowList: []

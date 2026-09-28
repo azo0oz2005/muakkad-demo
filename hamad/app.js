@@ -2,7 +2,7 @@
 
 /* ================= إعدادات المكتب ================= */
 // كل ما يخص المكتب هنا. غيّر القيم ثم ارفع الملف.
-const OFFICE = {
+const OFFICE = window.__OFFICE__ || {
   name: 'مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية',
   whatsapp: '966510090456',          // رقم استقبال الطلبات (دولي بدون +)
   price: 250,                         // حسب المكتب
@@ -134,19 +134,24 @@ $('payInfo').addEventListener('click', async (e) => {
 });
 
 /* ================= إحصاءات (بدون كوكيز ولا بيانات شخصية) ================= */
-const PAGE_KEY = 'hamad';
-function track(event) {
-  if (!OFFICE.goatcounter || !window.goatcounter || !window.goatcounter.count) return;
-  window.goatcounter.count({ path: `${PAGE_KEY}/${event}`, title: event, event: true });
+const PAGE_KEY = window.__OFFICE_SLUG__ || 'hamad';
+const SESSION_KEY = `muakkad-session-${PAGE_KEY}`;
+let sessionHash = sessionStorage.getItem(SESSION_KEY);
+if (!sessionHash) {
+  sessionHash = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
+  sessionStorage.setItem(SESSION_KEY, sessionHash);
 }
-if (OFFICE.goatcounter) {
-  window.goatcounter = { path: () => `${PAGE_KEY}/visit` };
-  const gc = document.createElement('script');
-  gc.async = true;
-  gc.src = '//gc.zgo.at/count.js';
-  gc.dataset.goatcounter = `https://${OFFICE.goatcounter}.goatcounter.com/count`;
-  document.head.appendChild(gc);
+async function api(path, options = {}) {
+  const response = await fetch(`/api/public/${PAGE_KEY}${path}`, {
+    headers: { 'content-type': 'application/json', ...(options.headers || {}) }, ...options
+  });
+  if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'تعذر حفظ الطلب.');
+  return response.status === 204 ? null : response.json();
 }
+function track(type, step = null) {
+  api('/event', { method:'POST', body:JSON.stringify({ type, step, sessionHash }) }).catch(() => {});
+}
+if (window.__OFFICE__) track('visit');
 let startedTracked = false;
 
 /* ================= حالة الرحلة ================= */
@@ -154,6 +159,8 @@ const form = $('intakeForm');
 const steps = [...document.querySelectorAll('.step')];
 let current = 1;
 let selectedDay = '';
+let bookingId = '';
+let bookingRef = '';
 
 const slotText = () => (selectedDay && radio('time') ? `${selectedDay}، ${radio('time')}` : '');
 
@@ -241,6 +248,7 @@ function buildMessage() {
   const summary = $('caseDetails').value.trim();
   return [
     'السلام عليكم، طلب حجز استشارة:',
+    bookingRef ? `رقم الطلب: ${bookingRef}` : '',
     '',
     `الاسم: ${$('name').value.trim()}`,
     `الجوال: ${normalizePhone($('phone').value)}`,
@@ -273,6 +281,9 @@ function render(focus = true) {
     $('revName').textContent = $('name').value.trim();
   }
   updateSummary();
+  if (window.__OFFICE__ && bookingId && current > 1 && current <= 5) {
+    api('/progress', { method:'PATCH', body:JSON.stringify({ bookingId, sessionHash, step:current }) }).catch(() => {});
+  }
   if (focus) {
     const h = document.querySelector('.step.active h2');
     $('live').textContent = inFlow ? `الخطوة ${current} من 5: ${STEP_NAMES[current - 1]}` : h.textContent;
@@ -295,6 +306,8 @@ function resetForm() {
   form.reset();
   current = 1;
   selectedDay = '';
+  bookingId = '';
+  bookingRef = '';
   $('charCount').textContent = '0';
   $('screening').innerHTML = '';
   document.querySelectorAll('.day').forEach((x) => x.setAttribute('aria-pressed', 'false'));
@@ -310,21 +323,48 @@ $('startBtn').addEventListener('click', () => {
 });
 $('nextBtn').addEventListener('click', () => { if (validate()) { current += 1; render(); } });
 $('backBtn').addEventListener('click', () => { if (current > 1) { current -= 1; render(); } });
-$('sendBtn').addEventListener('click', () => {
-  const url = waUrl();
-  track('sent');
-  $('resendLink').href = url;
-  window.open(url, '_blank', 'noopener');
-  current = 6;
-  render();
+$('sendBtn').addEventListener('click', async () => {
+  const button = $('sendBtn');
+  button.disabled = true;
+  button.textContent = 'جاري حفظ الطلب…';
+  try {
+    if (window.__OFFICE__) {
+      const answers = Object.fromEntries((SCREENING[radio('caseType')] || []).map((q) => [q.id, radio('q-' + q.id)]));
+      const result = await api('/submit', { method:'POST', body:JSON.stringify({
+        bookingId, sessionHash, caseType:radio('caseType'), answers,
+        summary:$('caseDetails').value.trim(), clientName:$('name').value.trim(), clientPhone:$('phone').value,
+        preferredDay:selectedDay, preferredPeriod:radio('time'), consent:$('consent').checked, website:$('website')?.value || ''
+      }) });
+      bookingId = result.id;
+      bookingRef = result.ref;
+    } else track('sent');
+    const url = waUrl();
+    $('resendLink').href = url;
+    window.open(url, '_blank', 'noopener');
+    current = 6;
+    render();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'أرسل الطلب للمكتب عبر واتساب';
+  }
 });
 $('restart').addEventListener('click', resetForm);
 
-form.addEventListener('change', (e) => {
+form.addEventListener('change', async (e) => {
   if (e.target.name === 'caseType') {
     renderScreening();
     setError('typeError', '');
-    if (!startedTracked) { startedTracked = true; track('started'); }
+    if (!startedTracked) {
+      startedTracked = true;
+      if (window.__OFFICE__) {
+        try {
+          const result = await api('/start', { method:'POST', body:JSON.stringify({ sessionHash, caseType:radio('caseType') }) });
+          bookingId = result.id; bookingRef = result.ref;
+        } catch (error) { console.error(error); }
+      } else track('started');
+    }
   }
   if (e.target.name === 'time') setError('timeError', '');
   if (e.target.name && e.target.name.startsWith('q-')) setError('err-' + e.target.name.slice(2), '');
