@@ -62,6 +62,20 @@ function requireAuth(role) {
   };
 }
 
+// لا يصل المستخدم لأي بيانات قبل تغيير كلمة المرور المؤقتة
+function requirePasswordChanged(req, res, next) {
+  if (req.session.user?.mustChangePassword) return res.status(403).json({ error: 'غيّر كلمة المرور المؤقتة أولًا.', mustChangePassword: true });
+  next();
+}
+
+function pageFor(role, file) {
+  return (req, res) => {
+    const user = req.session.user;
+    if (!user || user.role !== role) return res.redirect('/login');
+    res.sendFile(path.join(root, 'public', file));
+  };
+}
+
 function officeScope(req) {
   return req.session.user.role === 'owner_admin' ? null : req.session.user.officeId;
 }
@@ -135,8 +149,9 @@ app.post('/api/change-password', requireAuth(), requireCsrf, async (req, res) =>
 });
 
 app.get('/login', (_req, res) => res.sendFile(path.join(root, 'public', 'login.html')));
-app.get('/dashboard', (_req, res) => res.sendFile(path.join(root, 'public', 'dashboard.html')));
-app.get('/admin', (_req, res) => res.sendFile(path.join(root, 'public', 'admin.html')));
+app.get('/dashboard', pageFor('lawyer', 'dashboard.html'));
+app.get('/admin', pageFor('owner_admin', 'admin.html'));
+app.use(['/api/dashboard', '/api/admin'], (req, res, next) => (req.session.user ? requirePasswordChanged(req, res, next) : next()));
 
 app.get('/api/public/:slug/office', async (req, res) => {
   const office = await loadOffice(req.params.slug);

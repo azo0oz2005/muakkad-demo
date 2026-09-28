@@ -17,14 +17,16 @@ const caseTypes = {
       VALUES
         ('hamad','مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية','/hamad/logo-mark.png',
          '{"ink":"#1f2a4f","accent":"#5a6690"}'::jsonb,'966510090456',250,30,
-         '["صباحًا (9–12)","ظهرًا (12–4)","مساءً (4–9)","أي وقت"]'::jsonb,FALSE,$1,
+         '["صباحًا (9–12)","ظهرًا (12–4)","مساءً (4–9)","أي وقت"]'::jsonb,TRUE,$1,
          'بنك D360','حمد عواد الشريف','SA5536031016043771844027',
          'الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ.',
          NOW() + INTERVAL '14 days','trial')
-      ON CONFLICT (slug) DO UPDATE SET all_days=EXCLUDED.all_days, updated_at=NOW()
+      ON CONFLICT (slug) DO NOTHING
       RETURNING id`, [JSON.stringify(caseTypes)]);
 
-    const officeId = office.rows[0].id;
+    // لا نعدّل إعدادات مكتب موجود: المحامي يغيّرها من لوحته
+    const officeId = office.rows[0]?.id
+      || (await client.query("SELECT id FROM offices WHERE slug='hamad'")).rows[0].id;
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD_HASH) {
       await client.query(`INSERT INTO users (office_id,email,password_hash,role,must_change_password)
         VALUES (NULL,LOWER($1),$2,'owner_admin',TRUE)
