@@ -9,6 +9,21 @@ async function loadSettings(){const o=await request('/api/dashboard/settings');$
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-status],[data-followup]');if(!b)return;await request(`/api/dashboard/bookings/${b.dataset.id}`,{method:'PATCH',body:JSON.stringify({status:b.dataset.status,followupStatus:b.dataset.followup})});await Promise.all([loadSummary(),loadBookings()])});
 $('ranges').addEventListener('click',e=>{if(!e.target.dataset.range)return;currentRange=e.target.dataset.range;[...e.currentTarget.children].forEach(x=>x.classList.toggle('active',x===e.target));loadSummary()});$('tabs').addEventListener('click',e=>{if(!e.target.dataset.tab)return;currentTab=e.target.dataset.tab;[...e.currentTarget.children].forEach(x=>x.classList.toggle('active',x===e.target));loadBookings()});
 $('settings').addEventListener('submit',async e=>{e.preventDefault();await request('/api/dashboard/settings',{method:'PATCH',body:JSON.stringify({price:Number($('price').value),duration:Number($('duration').value),whatsapp:$('whatsapp').value,times:$('times').value.split(/[،,]/).map(x=>x.trim()).filter(Boolean),bankName:$('bankName').value,accountName:$('accountName').value,iban:$('iban').value,cancelPolicy:$('cancelPolicy').value,allDays:$('allDays').checked})});$('settingsMsg').textContent='تم الحفظ'});
-let officeUrl='';$('copyLink').onclick=()=>navigator.clipboard.writeText(officeUrl).then(()=>{$('copyLink').textContent='تم النسخ ✓'});$('logout').onclick=()=>request('/api/logout',{method:'POST',body:'{}'}).then(()=>location.href='/login');
-$('passwordForm').addEventListener('submit',async e=>{e.preventDefault();await request('/api/change-password',{method:'POST',body:JSON.stringify({password:$('newPassword').value})});location.reload()});
-(async()=>{const x=await request('/api/csrf');csrf=x.token;user=x.user;if(!user||user.role!=='lawyer'){location.href='/login';return}$('passwordBox').classList.toggle('hidden',!user.mustChangePassword);if(user.mustChangePassword){$('newPassword').focus();return}const link=await request('/api/dashboard/link');officeUrl=link.url;$('qr').src=link.qr;$('officeLink').href=link.url;$('officeLink').textContent=link.url;await Promise.all([loadSummary(),loadBookings()])})().catch(e=>console.error(e));
+let officeUrl='';
+function showError(msg){$('errorBox').textContent=msg;$('errorBox').classList.remove('hidden')}
+function setLink(url){if(!url)return;officeUrl=url;$('officeLink').href=url;$('officeLink').textContent=url}
+function copyLink(btn){if(!officeUrl)return;navigator.clipboard.writeText(officeUrl).then(()=>{btn.textContent='تم النسخ ✓'}).catch(()=>{prompt('انسخ الرابط:',officeUrl)})}
+$('copyLink').onclick=e=>copyLink(e.currentTarget);$('copyLink2').onclick=e=>copyLink(e.currentTarget);
+$('logout').onclick=()=>request('/api/logout',{method:'POST',body:'{}'}).then(()=>location.href='/login');
+$('passwordForm').addEventListener('submit',async e=>{e.preventDefault();$('passwordMsg').textContent='';try{await request('/api/change-password',{method:'POST',body:JSON.stringify({password:$('newPassword').value})});location.reload()}catch(err){$('passwordMsg').textContent=err.message}});
+async function loadLink(){try{const link=await request('/api/dashboard/link');setLink(link.url);if(link.qr){$('qr').src=link.qr;$('qr').hidden=false}}catch(err){if(summary?.office?.slug)setLink(`${location.origin}/${summary.office.slug}`);else $('officeLink').textContent='تعذر تحميل الرابط، حدّث الصفحة.'}}
+(async()=>{
+  const x=await request('/api/csrf');csrf=x.token;user=x.user;
+  if(!user||user.role!=='lawyer'){location.href='/login';return}
+  if(user.mustChangePassword){$('app').classList.add('hidden');$('passwordBox').classList.remove('hidden');$('newPassword').focus();return}
+  $('passwordBox').classList.add('hidden');
+  const results=await Promise.allSettled([loadSummary(),loadBookings()]);
+  await loadLink();
+  const failed=results.find(r=>r.status==='rejected');
+  if(failed)showError('تعذر تحميل جزء من البيانات: '+failed.reason.message);
+})().catch(e=>showError('تعذر تحميل اللوحة: '+e.message));

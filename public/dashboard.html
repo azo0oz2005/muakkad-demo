@@ -5,16 +5,20 @@
   <title>لوحة المكتب | مؤكّد</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/platform/platform.css">
+  <link rel="stylesheet" href="/platform/platform.css?v=2">
+  <style>.office-link{word-break:break-all;font-size:14px;direction:ltr;text-align:right}.office-link a{color:inherit}#qr{display:block;margin-top:12px;max-width:100%;height:auto}.error-box{color:#a23b3b;border-color:#f0c9c9;background:#fdf1f1}#copyLink2{width:100%;margin-top:6px}</style>
 </head>
 <body><main class="shell">
   <header class="top"><div><div class="brand">مؤكّد</div><p class="muted" id="officeName"></p></div><div class="actions"><button class="secondary" id="copyLink">نسخ رابطي</button><button class="secondary" id="logout">خروج</button></div></header>
-  <section id="passwordBox" class="panel hidden"><h2>غيّر كلمة المرور المؤقتة</h2><form id="passwordForm" class="actions"><input id="newPassword" type="password" minlength="10" placeholder="10 أحرف على الأقل" required><button class="primary">حفظ</button><p id="passwordMsg"></p></form></section>
+  <p id="errorBox" class="panel error-box hidden" role="alert"></p>
+  <section id="passwordBox" class="panel hidden"><h2>غيّر كلمة المرور المؤقتة</h2><p class="muted">لحماية بيانات عملائك، اختر كلمة مرور جديدة قبل فتح اللوحة.</p><form id="passwordForm" class="actions"><input id="newPassword" type="password" minlength="10" placeholder="10 أحرف على الأقل" required><button class="primary">حفظ</button><p id="passwordMsg"></p></form></section>
+  <div id="app">
   <div class="filters" id="ranges"><button data-range="today">اليوم</button><button class="active" data-range="7d">7 أيام</button><button data-range="30d">30 يوم</button><button data-range="all">الكل</button></div>
   <section class="stats" id="stats"></section>
   <div class="grid"><section>
     <div class="tabs" id="tabs"><button class="active" data-tab="awaiting">بانتظار الدفع</button><button data-tab="paid">مدفوعة / مؤكدة</button><button data-tab="incomplete">غير مكتملة</button><button data-tab="settings">الإعدادات</button></div>
     <div class="list" id="bookings"></div>
     <form id="settings" class="panel settings hidden"><label class="field">السعر<input id="price" type="number" min="0"></label><label class="field">المدة بالدقائق<input id="duration" type="number" min="10"></label><label class="field">واتساب<input id="whatsapp" dir="ltr"></label><label class="field">الفترات، افصل بفاصلة<input id="times"></label><label class="field">البنك<input id="bankName"></label><label class="field">المستفيد<input id="accountName"></label><label class="field wide">الآيبان<input id="iban" dir="ltr"></label><label class="field wide">سياسة الإلغاء<textarea id="cancelPolicy"></textarea></label><label><input id="allDays" type="checkbox"> عرض كل أيام الأسبوع</label><button class="primary">حفظ الإعدادات</button><p id="settingsMsg"></p></form>
-  </section><aside class="panel"><h2>قمع الحجز</h2><div class="funnel" id="funnel"></div><p class="muted">يوضح آخر خطوة وصل لها العملاء.</p><hr><h2>رابط المكتب</h2><img id="qr" width="180" height="180" alt="رمز QR لرابط المكتب"><p><a id="officeLink" target="_blank"></a></p></aside></div>
-</main><script src="/platform/dashboard.js"></script></body></html>
+  </section><aside class="panel"><h2>قمع الحجز</h2><div class="funnel" id="funnel"></div><p class="muted">يوضح آخر خطوة وصل لها العملاء.</p><hr><h2>رابط المكتب</h2><p class="office-link"><a id="officeLink" target="_blank" rel="noopener">جارٍ التحميل…</a></p><button class="primary" id="copyLink2" type="button">نسخ الرابط</button><img id="qr" width="180" height="180" alt="رمز QR لرابط المكتب" hidden></aside></div>
+  </div>
+</main><script src="/platform/dashboard.js?v=2"></script></body></html>
