@@ -10,6 +10,12 @@ const FIXES = [
     run: (c) => c.query("UPDATE offices SET all_days=TRUE, updated_at=NOW() WHERE slug='hamad'")
   },
   {
+    // حساب حمد يستخدم كلمة المرور المسلّمة له بدون إجباره على تغييرها.
+    id: '2026-09-29-hamad-keep-issued-password',
+    run: (c) => c.query(`UPDATE users SET must_change_password=FALSE
+      WHERE office_id=(SELECT id FROM offices WHERE slug='hamad') AND role='lawyer'`)
+  },
+  {
     // تصفير بيانات الاختبار قبل تسليم اللوحة لحمد.
     // نحفظ نسخة كاملة قبل الحذف في جداول *_purged_backup، فلا يضيع شيء لو كان بينها طلب حقيقي.
     id: '2026-09-28-hamad-purge-test-data',

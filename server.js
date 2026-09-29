@@ -113,7 +113,15 @@ app.get('/', (_req, res) => res.redirect('/demo'));
 app.get('/demo', (_req, res) => res.sendFile(path.join(root, 'index.html')));
 app.get('/privacy', (_req, res) => res.sendFile(path.join(root, 'public', 'privacy.html')));
 
-app.get('/api/csrf', (req, res) => res.json({ token: csrfToken(req), user: req.session.user || null }));
+app.get('/api/csrf', async (req, res, next) => {
+  try {
+    if (req.session.user) {
+      const result = await query('SELECT must_change_password FROM users WHERE id=$1', [req.session.user.id]);
+      if (result.rows[0]) req.session.user.mustChangePassword = result.rows[0].must_change_password;
+    }
+    res.json({ token: csrfToken(req), user: req.session.user || null });
+  } catch (error) { next(error); }
+});
 
 app.post('/api/login', requireCsrf, async (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();

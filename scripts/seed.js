@@ -34,7 +34,7 @@ const caseTypes = {
     }
     if (process.env.HAMAD_EMAIL && process.env.HAMAD_PASSWORD_HASH) {
       await client.query(`INSERT INTO users (office_id,email,password_hash,role,must_change_password)
-        VALUES ($1,LOWER($2),$3,'lawyer',TRUE)
+        VALUES ($1,LOWER($2),$3,'lawyer',FALSE)
         ON CONFLICT (email) DO NOTHING`, [officeId, process.env.HAMAD_EMAIL, process.env.HAMAD_PASSWORD_HASH]);
     }
     await client.query('COMMIT');
