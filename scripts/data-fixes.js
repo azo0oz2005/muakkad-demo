@@ -31,6 +31,22 @@ const FIXES = [
       await c.query('DELETE FROM events WHERE office_id=$1', [officeId]);
       console.log(`hamad: backed up and cleared ${b.rowCount} bookings, ${e.rowCount} events`);
     }
+  },
+  {
+    // حذف تجربة التسليم الأخيرة من لوحة حمد مع حفظ نسخة احتياطية.
+    id: '2026-09-29-hamad-purge-delivery-test',
+    run: async (c) => {
+      await c.query('CREATE TABLE IF NOT EXISTS bookings_purged_backup (LIKE bookings INCLUDING DEFAULTS)');
+      await c.query('CREATE TABLE IF NOT EXISTS events_purged_backup (LIKE events INCLUDING DEFAULTS)');
+      const office = await c.query("SELECT id FROM offices WHERE slug='hamad'");
+      const officeId = office.rows[0]?.id;
+      if (!officeId) return;
+      const b = await c.query('INSERT INTO bookings_purged_backup SELECT * FROM bookings WHERE office_id=$1', [officeId]);
+      const e = await c.query('INSERT INTO events_purged_backup SELECT * FROM events WHERE office_id=$1', [officeId]);
+      await c.query('DELETE FROM bookings WHERE office_id=$1', [officeId]);
+      await c.query('DELETE FROM events WHERE office_id=$1', [officeId]);
+      console.log(`hamad delivery test: backed up and cleared ${b.rowCount} bookings, ${e.rowCount} events`);
+    }
   }
 ];
 
