@@ -383,6 +383,11 @@ app.get('/:slug', async (req, res, next) => {
     html = html.replaceAll('حمد بن عواد الشريف', 'علي العقلا').replaceAll('المدينة المنورة', 'الرياض')
       .replace('</head>', '<style>.brand-logo{width:110px;height:auto;max-width:30vw}.offer-logo{width:120px;height:auto;max-width:28vw;object-fit:contain}</style></head>');
   }
+  if (office.slug === 'shathri') {
+    html = html.replaceAll('حمد بن عواد الشريف', 'عبدالله الشثري').replaceAll('المدينة المنورة', 'الرياض')
+      .replace(`<h1 id="offerTitle">${officeName}</h1>`, '<h1 id="offerTitle">مكتب عبدالله الشثري</h1>')
+      .replace('</head>', '<style>.brand-logo{width:64px;height:64px;max-width:20vw}.offer-logo{width:72px;height:72px;max-width:22vw;object-fit:contain}</style></head>');
+  }
   res.type('html').send(html);
 });
 

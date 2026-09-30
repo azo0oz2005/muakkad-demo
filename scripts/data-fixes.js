@@ -5,6 +5,18 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // بيانات المكتب من دليل الهيئة السعودية للمحامين؛ الإعدادات أمثلة للمراجعة.
+    id: '2026-09-30-shathri-preview',
+    run: (c) => c.query(`INSERT INTO offices
+      (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only)
+      VALUES ('shathri','مكتب عبدالله عبدالعزيز عبدالرحمن الشثري للمحاماة',
+      '/platform/shathri/name-mark.svg','966505428010',250,30,
+      '["صباحًا (9–12)","ظهرًا (12–4)","مساءً (4–9)","أي وقت"]',TRUE,
+      '{"labor":"عمالية","enforcement":"تنفيذ ومطالبات","commercial":"تجارية","realestate":"عقارية","family":"أحوال شخصية","other":"أخرى"}',
+      'تُحدد سياسة الإلغاء عند تفعيل الخدمة مع المكتب.',TRUE)
+      ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
     // نموذج للمراجعة فقط؛ لا ننسخ حساب الشريف أو بيانات التحويل.
     id: '2026-09-30-alogla-preview',
     run: (c) => c.query(`INSERT INTO offices
