@@ -108,6 +108,11 @@ document.querySelectorAll('[data-price]').forEach((el) => { el.textContent = OFF
 document.querySelectorAll('[data-duration]').forEach((el) => { el.textContent = OFFICE.duration; });
 $('cancelPolicy').textContent = OFFICE.cancelPolicy + ' (قد يحدد المكتب سياسة مختلفة عند تأكيد الموعد.)';
 $('draftRibbon').hidden = !OFFICE.draft;
+if (OFFICE.draft) {
+  $('draftRibbon').textContent = 'نسخة للمراجعة فقط — 250 ريال و30 دقيقة والأوقات أمثلة، لم يعتمدها المكتب. الحجز والدفع غير مفعّلين.';
+  $('sendBtn').textContent = 'الحجز غير مفعّل — نسخة للمراجعة';
+  $('sendBtn').disabled = true;
+}
 $('times').insertAdjacentHTML('beforeend', OFFICE.times
   .map((t) => `<label><input type="radio" name="time" value="${t}"><span>${t}</span></label>`).join(''));
 
@@ -149,9 +154,10 @@ async function api(path, options = {}) {
   return response.status === 204 ? null : response.json();
 }
 function track(type, step = null) {
+  if (OFFICE.draft) return;
   api('/event', { method:'POST', body:JSON.stringify({ type, step, sessionHash }) }).catch(() => {});
 }
-if (window.__OFFICE__) track('visit');
+if (window.__OFFICE__ && !OFFICE.draft) track('visit');
 let startedTracked = false;
 
 /* ================= حالة الرحلة ================= */
@@ -281,7 +287,7 @@ function render(focus = true) {
     $('revName').textContent = $('name').value.trim();
   }
   updateSummary();
-  if (window.__OFFICE__ && bookingId && current > 1 && current <= 5) {
+  if (window.__OFFICE__ && !OFFICE.draft && bookingId && current > 1 && current <= 5) {
     const contact = current >= 5 ? { clientName:$('name').value.trim(), clientPhone:$('phone').value } : {};
     api('/progress', { method:'PATCH', body:JSON.stringify({ bookingId, sessionHash, step:current, ...contact }) }).catch(() => {});
   }
@@ -325,11 +331,12 @@ $('startBtn').addEventListener('click', () => {
 $('nextBtn').addEventListener('click', () => { if (validate()) { current += 1; render(); } });
 $('backBtn').addEventListener('click', () => { if (current > 1) { current -= 1; render(); } });
 $('sendBtn').addEventListener('click', async () => {
+  if (OFFICE.draft) return;
   const button = $('sendBtn');
   button.disabled = true;
   button.textContent = 'جاري حفظ الطلب…';
   try {
-    if (window.__OFFICE__) {
+    if (window.__OFFICE__ && !OFFICE.draft) {
       const answers = Object.fromEntries((SCREENING[radio('caseType')] || []).map((q) => [q.id, radio('q-' + q.id)]));
       const result = await api('/submit', { method:'POST', body:JSON.stringify({
         bookingId, sessionHash, caseType:radio('caseType'), answers,
@@ -359,7 +366,7 @@ form.addEventListener('change', async (e) => {
     setError('typeError', '');
     if (!startedTracked) {
       startedTracked = true;
-      if (window.__OFFICE__) {
+      if (window.__OFFICE__ && !OFFICE.draft) {
         try {
           const result = await api('/start', { method:'POST', body:JSON.stringify({ sessionHash, caseType:radio('caseType') }) });
           bookingId = result.id; bookingRef = result.ref;

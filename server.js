@@ -39,6 +39,12 @@ const publicLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 80, standardH
 const submitLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 12, standardHeaders: 'draft-8', legacyHeaders: false });
 
 app.use('/api/public', publicLimiter);
+app.use('/api/public/:slug', async (req, res, next) => {
+  if (req.method === 'GET') return next();
+  const office = await loadOffice(req.params.slug);
+  if (office?.preview_only) return res.status(403).json({ error: 'نسخة للمراجعة فقط؛ الحجز لم يُفعّل بعد.' });
+  next();
+});
 app.use('/styles.css', express.static(path.join(root, 'styles.css')));
 app.use('/app.js', express.static(path.join(root, 'app.js')));
 app.use('/hamad', express.static(path.join(root, 'hamad'), { index: false }));
@@ -91,7 +97,7 @@ function safeOffice(row) {
     whatsapp: row.whatsapp, price: row.price, duration: row.duration_min,
     times: row.periods, allDays: row.all_days, caseTypes: row.case_types,
     bankName: row.bank_name, accountName: row.account_name, iban: row.iban,
-    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status
+    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only
   };
 }
 
@@ -370,9 +376,13 @@ app.get('/:slug', async (req, res, next) => {
     .replaceAll('logo-mark.png', office.logo_url || '/hamad/logo-mark.png')
     .replace('href="../styles.css?v=4"','href="/styles.css?v=5"')
     .replace('href="hamad.css?v=2"','href="/hamad/hamad.css?v=3"')
-    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=5"></script>`)
+    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=6"></script>`)
     .replace('لا تُحفظ بياناتك على أي خادم في هذه الصفحة، ونستخدم إحصاءً مجهولًا لعدد الزيارات فقط بدون كوكيز. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.', 'تُحفظ بيانات الطلب بأقل قدر لازم لتأكيد الاستشارة ومتابعتها، ثم تُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع.')
     .replace('</form>', '<label class="sr-only">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>');
+  if (office.slug === 'alogla') {
+    html = html.replaceAll('حمد بن عواد الشريف', 'علي العقلا').replaceAll('المدينة المنورة', 'الرياض')
+      .replace('</head>', '<style>.brand-logo{width:110px;height:auto;max-width:30vw}.offer-logo{width:120px;height:auto;max-width:28vw;object-fit:contain}</style></head>');
+  }
   res.type('html').send(html);
 });
 
