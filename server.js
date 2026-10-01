@@ -134,13 +134,18 @@ app.get('/api/csrf', async (req, res, next) => {
 app.post('/api/login', requireCsrf, async (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
-  const lock = loginLocks.get(email);
+  // Expired failures must not lock the next attempt immediately again.
+  let lock = loginLocks.get(email);
+  if (lock && (lock.until || lock.expiresAt) <= Date.now()) {
+    loginLocks.delete(email);
+    lock = undefined;
+  }
   if (lock?.until > Date.now()) return res.status(429).json({ error: 'محاولات كثيرة. حاول بعد 15 دقيقة.' });
   const result = await query('SELECT id,office_id,email,password_hash,role,must_change_password,locked_until FROM users WHERE email=$1', [email]);
   const user = result.rows[0];
   const ok = user && (!user.locked_until || new Date(user.locked_until) <= new Date()) && await bcrypt.compare(password, user.password_hash);
   if (!ok) {
-    const next = { count: (lock?.count || 0) + 1, until: 0 };
+    const next = { count: (lock?.count || 0) + 1, until: 0, expiresAt: lock?.expiresAt || Date.now() + 15 * 60 * 1000 };
     if (next.count >= 5) next.until = Date.now() + 15 * 60 * 1000;
     loginLocks.set(email, next);
     return res.status(401).json({ error: 'البريد أو كلمة المرور غير صحيحة.' });
