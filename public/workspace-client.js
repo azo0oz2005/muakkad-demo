@@ -1,6 +1,8 @@
 'use strict';
 const office=window.__OFFICE__, config=office.workspace;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if(office.logoUrl){$('officeLogo').src=office.logoUrl;$('officeLogo').hidden=false;$('officeMonogram').hidden=true;}
+document.querySelector('.hero-copy').textContent=`احجز استشارة شفهية أو اطلب خدمة قانونية من ${office.name}. يصل طلبك للمكتب، وتتابع معه مباشرة.`;
 const dayNow=()=>new Date(Date.now()+3*3600000).toISOString().slice(0,10);
 let mode='consultation',selectedTime='',requestKey=crypto.randomUUID(),slotVersion=0;
 let sessionHash=sessionStorage.getItem(`workspace-${office.slug}`);
