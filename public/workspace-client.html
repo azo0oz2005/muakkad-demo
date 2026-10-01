@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex"><title>__OFFICE_NAME__ | حجز وخدمات قانونية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/platform/workspace.css?v=1">
+</head>
+<body>
+  <header class="site-header wrap"><a class="office-brand" href="#"><span class="monogram" aria-hidden="true">آل جابر</span><span>مكتب علي محمد إبراهيم آل جابر<small>للمحاماة والاستشارات القانونية</small></span></a><span class="city">خميس مشيط</span></header>
+  <main class="wrap">
+    <section class="hero"><div><p class="eyebrow">وقت واضح. طلب مرتب.</p><h1>استشارتك القانونية،<br><span>بموعد يناسبك.</span></h1><p class="hero-copy">احجز استشارة أو اطلب خدمة قانونية من مكتب علي محمد إبراهيم آل جابر. يصل طلبك للمكتب، وتتابع معه مباشرة.</p><a class="button bronze" href="#requestPanel">ابدأ طلبك <span aria-hidden="true">↙</span></a><p class="hero-foot">بدون إنشاء حساب · تواصل مباشر مع المكتب</p></div><aside class="hero-card"><span class="card-kicker">المكتب يستقبل</span><h2>استشارات<br>وخدمات قانونية</h2><div class="hero-tags"><span>مذكرات</span><span>دعاوى</span><span>اعتراضات</span></div><div class="hero-rule"></div><p>اختر الخدمة، وأرسل طلبك.<br>الأتعاب تُحدد حسب نوع الطلب.</p><span class="card-seal" aria-hidden="true">آل جابر</span></aside></section>
+    <p id="trialBanner" class="trial-banner" hidden>نسخة تجريبية للمكتب — السعر والأوقات أمثلة قابلة للتعديل. لا يوجد دفع فعلي.</p>
+    <div class="client-layout">
+      <section class="panel request-panel" id="requestPanel"><div class="section-heading"><p class="eyebrow">رابط المكتب</p><h2>إيش تحتاج اليوم؟</h2></div>
+        <div class="mode-tabs" role="group" aria-label="نوع الطلب"><button type="button" class="active" id="consultationTab" aria-pressed="true">حجز استشارة</button><button type="button" id="serviceTab" aria-pressed="false">طلب خدمة قانونية</button></div>
+        <form id="requestForm">
+          <div id="consultationFields"><div class="field-row"><label class="field">نوع القضية<select id="caseType" required></select></label><label class="field">اليوم<input type="date" id="day" required></label></div><fieldset class="slot-fieldset"><legend>اختر الوقت <small>بتوقيت السعودية</small></legend><div class="slots" id="slots"><p class="muted">اختر يومًا لعرض الأوقات المتاحة.</p></div></fieldset><p class="hint">الأوقات المحجوزة تظهر غير متاحة. يُحجز الوقت عند إرسال الطلب، ويؤكد المكتب الدفع.</p></div>
+          <div id="serviceFields" hidden><label class="field">الخدمة المطلوبة<select id="service"></select></label><p class="notice">يراجع المكتب طلبك، ثم يحدد الأتعاب والمدة قبل البدء. لا يلزم اختيار موعد.</p></div>
+          <label class="field">ملخص الطلب <span class="optional">اختياري</span><textarea id="summary" rows="3" maxlength="300" placeholder="وصف مختصر بدون بيانات حساسة أو تفاصيل القضية"></textarea></label>
+          <p class="hint">لا تكتب هوية أو رقم قضية أو أسماء خصوم، ولا ترسل مستندات عبر النموذج.</p>
+          <div class="field-row"><label class="field">الاسم<input id="name" autocomplete="name" maxlength="60" minlength="2" required></label><label class="field">رقم الجوال<input id="phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="05xxxxxxxx" required></label></div>
+          <label class="consent"><input type="checkbox" id="consent" required><span>أوافق على <button type="button" class="text-button" id="privacyOpen">الخصوصية وسياسة الإلغاء</button>.</span></label>
+          <label class="honeypot" aria-hidden="true">اتركه فارغًا<input id="website" tabindex="-1" autocomplete="off"></label>
+          <div class="form-total"><span id="feeLabel">قيمة الاستشارة</span><strong id="fee"></strong></div>
+          <p id="requestError" class="error" role="alert"></p><button class="button bronze full" id="sendRequest">إرسال طلب الاستشارة</button><p class="hint centered">يُحفظ الطلب في لوحة المكتب. بعدها تقدر تفتح واتساب برسالة جاهزة.</p>
+        </form>
+        <section id="success" class="success-panel" hidden tabindex="-1"><span class="success-mark">✓</span><h2>وصل طلبك للمكتب</h2><p id="successText"></p><div id="paymentDetails"></div><a id="whatsappLink" class="button bronze full" target="_blank" rel="noopener">متابعة الطلب على واتساب</a><button class="text-button" id="newRequest">إرسال طلب جديد</button></section>
+      </section>
+      <aside class="client-aside"><section class="panel details-panel"><p class="eyebrow">كيف يمشي طلبك؟</p><ol class="journey"><li><b>تختار المطلوب</b><span>استشارة بموعد، أو خدمة قانونية.</span></li><li><b>يراجع المكتب طلبك</b><span>يتواصل معك لتأكيد الموعد أو عرض الأتعاب.</span></li><li><b>الدفع لحساب المكتب</b><span>مباشرة، بدون وسيط أو عمولة.</span></li></ol></section><section class="contact-card"><span class="eyebrow">تواصل مع المكتب</span><h3>عندك سؤال عن الحجز؟</h3><a id="officeWhatsApp" target="_blank" rel="noopener">تواصل على واتساب ↙</a><p>الأسئلة القانونية تُناقش مع المحامي ضمن الخدمة.</p></section></aside>
+    </div>
+  </main><footer class="wrap footer"><span>__OFFICE_NAME__</span><span>بواسطة <b>مؤكّد</b></span></footer>
+  <dialog id="privacy"><h2>الخصوصية وسياسة الإلغاء</h2><p>نجمع الاسم والجوال ونوع الطلب وملخصًا اختياريًا والموعد، للتواصل بخصوص الطلب. تُخفى البيانات الشخصية بعد 90 يومًا. لا نطلب هوية أو رقم قضية أو أسماء خصوم أو مستندات.</p><p>يفتح واتساب فقط عند اختيارك متابعة الطلب، والإرسال يتم بواسطتك داخل واتساب.</p><p id="cancelPolicy"></p><button class="button" id="privacyClose">إغلاق</button></dialog>
+  <script>window.__OFFICE__=__OFFICE_CONFIG__;</script><script src="/platform/workspace-client.js?v=1"></script>
+</body></html>

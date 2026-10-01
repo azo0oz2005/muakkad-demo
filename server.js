@@ -97,7 +97,8 @@ function safeOffice(row) {
     whatsapp: row.whatsapp, price: row.price, duration: row.duration_min,
     times: row.periods, allDays: row.all_days, caseTypes: row.case_types,
     bankName: row.bank_name, accountName: row.account_name, iban: row.iban,
-    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only
+    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only,
+    workspace: row.workspace_config
   };
 }
 
@@ -163,9 +164,22 @@ app.post('/api/change-password', requireAuth(), requireCsrf, async (req, res) =>
 });
 
 app.get('/login', (_req, res) => res.sendFile(path.join(root, 'public', 'login.html')));
-app.get('/dashboard', pageFor('lawyer', 'dashboard.html'));
+app.get('/dashboard', async (req,res) => {
+  if (req.session.user?.role !== 'lawyer') return res.redirect('/login');
+  const office = (await query('SELECT workspace_config FROM offices WHERE id=$1',[req.session.user.officeId])).rows[0];
+  res.sendFile(path.join(root,'public',office?.workspace_config?.enabled ? 'workspace-dashboard.html' : 'dashboard.html'));
+});
 app.get('/admin', pageFor('owner_admin', 'admin.html'));
-app.use(['/api/dashboard', '/api/admin'], (req, res, next) => (req.session.user ? requirePasswordChanged(req, res, next) : next()));
+app.use(['/api/dashboard', '/api/admin', '/api/workspace'], (req, res, next) => (req.session.user ? requirePasswordChanged(req, res, next) : next()));
+
+require('./src/workspace')(app,{ pool,query,loadOffice,safeOffice,requireAuth,requireCsrf,submitLimiter });
+app.use('/api/public/:slug',async(req,res,next)=>{
+  if (req.method !== 'GET' && ['/start','/progress','/submit'].includes(req.path)) {
+    const office=await loadOffice(req.params.slug);
+    if(office?.workspace_config?.enabled) return res.status(400).json({error:'استخدم نموذج الحجز في رابط المكتب.'});
+  }
+  next();
+});
 
 app.get('/api/public/:slug/office', async (req, res) => {
   const office = await loadOffice(req.params.slug);
@@ -280,6 +294,7 @@ app.get('/api/dashboard/bookings', requireAuth(), async (req, res) => {
 
 app.patch('/api/dashboard/bookings/:id', requireAuth(), requireCsrf, async (req, res) => {
   const officeId = officeScope(req);
+  if((await query('SELECT workspace_config FROM offices WHERE id=$1',[officeId])).rows[0]?.workspace_config?.enabled) return res.status(400).json({error:'استخدم لوحة المواعيد والخدمات.'});
   const status = ['paid','confirmed','cancelled','no_show'].includes(req.body.status) ? req.body.status : null;
   const followup = ['none','followed','not_interested'].includes(req.body.followupStatus) ? req.body.followupStatus : null;
   if (!officeId || (!status && !followup)) return res.status(400).json({ error: 'حالة غير صالحة.' });
@@ -367,6 +382,13 @@ app.get('/:slug', async (req, res, next) => {
   const office = await loadOffice(req.params.slug);
   if (!office) return res.status(404).send('المكتب غير موجود');
   if (!office.active || office.plan_status === 'paused') return res.status(503).send('<main dir="rtl" style="font-family:system-ui;max-width:600px;margin:15vh auto;padding:24px"><h1>الحجز متوقف مؤقتًا</h1><p>تواصل مع المكتب مباشرة، ونعتذر عن الإزعاج.</p></main>');
+  if(office.workspace_config?.enabled) {
+    const config=safeOffice(office);
+    const html=fs.readFileSync(path.join(root,'public','workspace-client.html'),'utf8')
+      .replaceAll('__OFFICE_NAME__',escapeHtml(office.name))
+      .replace('__OFFICE_CONFIG__',JSON.stringify(config).replace(/</g,'\\u003c'));
+    return res.type('html').send(html);
+  }
   let html = fs.readFileSync(path.join(root,'hamad','index.html'),'utf8');
   const config = safeOffice(office);
   const officeName = escapeHtml(cleanText(office.name,140));

@@ -1,0 +1,53 @@
+'use strict';
+
+// Isolated integration schema; no production rows changed or deleted.
+const fs=require('fs');const path=require('path');const assert=require('node:assert/strict');const crypto=require('crypto');
+const {Pool}=require('pg');const express=require('express');const mount=require('../src/workspace');const {DEFAULT_CONFIG,riyadhDay}=require('../src/schedule');
+const rootPool=new Pool({connectionString:process.env.DATABASE_URL});
+const schema='verify_workspace_'+crypto.randomBytes(5).toString('hex');
+const testPool=new Pool({connectionString:process.env.DATABASE_URL,options:`-c search_path=${schema}`});
+let server;
+(async()=>{
+  await rootPool.query(`CREATE SCHEMA ${schema}`);
+  const source=fs.readFileSync(path.join(__dirname,'migrate.js'),'utf8');
+  const sql=source.match(/const sql = `([\s\S]*?)`;/)[1].replace('CREATE EXTENSION IF NOT EXISTS pgcrypto;','');
+  await testPool.query(sql);
+  const create=async(slug)=> (await testPool.query(`INSERT INTO offices (slug,name,whatsapp,price,duration_min,case_types,workspace_config) VALUES ($1,'اختبار معزول','966500000000',250,30,'{"other":"أخرى"}',$2) RETURNING *`,[slug,JSON.stringify(DEFAULT_CONFIG)])).rows[0];
+  const office=await create('verify-one'),other=await create('verify-two');
+  const csrf=crypto.randomBytes(16).toString('hex');
+  const app=express();app.use(express.json());
+  const loadOffice=async slug=>(await testPool.query('SELECT * FROM offices WHERE slug=$1',[slug])).rows[0];
+  const requireAuth=()=> (req,res,next)=>{const id=req.get('x-office-id');if(!id)return res.status(401).json({error:'auth'});req.session={user:{officeId:id}};next();};
+  const requireCsrf=(req,res,next)=>req.get('x-csrf-token')===csrf?next():res.status(403).json({error:'csrf'});
+  mount(app,{pool:testPool,query:(sql,args)=>testPool.query(sql,args),loadOffice,safeOffice:o=>o,requireAuth,requireCsrf,submitLimiter:(_req,_res,next)=>next()});
+  app.use((error,_req,res,_next)=>{console.error(error);res.status(500).json({error:error.message});});
+  server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
+  const base=`http://127.0.0.1:${server.address().port}`;
+  async function request(url,body,method='POST',officeId=office.id){const r=await fetch(base+url,{method:body?method:'GET',headers:{'content-type':'application/json','x-office-id':String(officeId),'x-csrf-token':csrf},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json()};}
+  let day=new Date(Date.now()+86400000);while(!DEFAULT_CONFIG.days.includes(new Date(day.getTime()+3*3600000).getUTCDay()))day=new Date(day.getTime()+86400000);day=riyadhDay(day);
+  const slots=(await request(`/api/public/verify-one/slots?day=${day}`)).data;
+  const payload={kind:'consultation',clientName:'اختبار',clientPhone:'0501234567',caseType:'other',day,time:slots[0].time,consent:true,sessionHash:crypto.randomUUID()};
+  const parallel=await Promise.all([request('/api/public/verify-one/request',{...payload,requestKey:crypto.randomUUID()}),request('/api/public/verify-one/request',{...payload,requestKey:crypto.randomUUID()})]);
+  assert.deepEqual(parallel.map(r=>r.status).sort(),[201,409]);console.log('PASS: simultaneous booking admits exactly one client');
+  const booking=parallel.find(r=>r.status===201).data;
+  assert.equal((await request(`/api/public/verify-one/slots?day=${day}`)).data[0].available,false);
+  assert.equal((await request(`/api/workspace/requests/${booking.id}`,{status:'cancelled'},'PATCH',other.id)).status,404);console.log('PASS: office isolation');
+  assert.equal((await request(`/api/workspace/requests/${booking.id}`,{status:'cancelled'},'PATCH')).status,200);
+  assert.equal((await request(`/api/public/verify-one/slots?day=${day}`)).data[0].available,true);
+  assert.equal((await request(`/api/workspace/requests/${booking.id}`,{status:'confirmed'},'PATCH')).status,400);console.log('PASS: cancellation releases slot without reopening closed bookings');
+  const key=crypto.randomUUID();const first=await request('/api/public/verify-one/request',{...payload,requestKey:key});const retry=await request('/api/public/verify-one/request',{...payload,requestKey:key});assert.equal(first.data.id,retry.data.id);console.log('PASS: idempotent submission');
+  const service=await request('/api/public/verify-one/request',{...payload,kind:'service',service:'مذكرة رد',day:null,requestKey:crypto.randomUUID()});assert.equal(service.status,201);
+  assert.equal((await request(`/api/workspace/requests/${service.data.id}`,{status:'paid'},'PATCH')).status,400);
+  assert.equal((await request(`/api/workspace/requests/${service.data.id}`,{quote:750,note:'خلال 3 أيام'},'PATCH')).status,200);
+  assert.equal((await request(`/api/workspace/requests/${service.data.id}`,{status:'paid'},'PATCH')).status,200);console.log('PASS: service requests and separate fees');
+  const block=await request('/api/workspace/blocks',{day,time:slots[2].time});assert.equal(block.status,201);
+  assert.equal((await request('/api/public/verify-one/request',{...payload,time:slots[2].time,requestKey:crypto.randomUUID()})).status,409);
+  const blocked=(await request('/api/workspace')).data.blocks[0];assert.equal((await request(`/api/workspace/blocks/${blocked.id}`,{},'PATCH')).status,200);
+  assert.equal((await request(`/api/public/verify-one/slots?day=${day}`)).data[2].available,true);console.log('PASS: manual calendar blocks and release');
+  const settings={...DEFAULT_CONFIG,price:250,duration:15,whatsapp:'0569788664',iban:'',bankName:'',accountName:'',cancelPolicy:''};
+  assert.equal((await request('/api/workspace/settings',settings,'PATCH')).status,200);
+  const updated=(await request(`/api/public/verify-one/slots?day=${day}`)).data;assert.equal(updated[0].available,false);assert.equal(updated[1].available,false);assert.equal(updated[2].available,true);
+  assert.equal((await request('/api/workspace/settings',{...settings,testMode:false},'PATCH')).status,400);console.log('PASS: schedule changes preserve existing appointments; real payments require office IBAN');
+  await testPool.query('UPDATE offices SET active=FALSE');
+  console.log('WORKSPACE INTEGRATION PASSED; isolated schema retained: '+schema);
+})().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{if(server)await new Promise(resolve=>server.close(resolve));await testPool.end();await rootPool.end();});

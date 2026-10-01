@@ -74,6 +74,24 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE INDEX IF NOT EXISTS bookings_office_status_idx ON bookings(office_id, status, updated_at DESC);
 CREATE INDEX IF NOT EXISTS bookings_session_idx ON bookings(office_id, session_hash);
 CREATE INDEX IF NOT EXISTS events_office_created_idx ON events(office_id, created_at DESC);
+
+ALTER TABLE offices ADD COLUMN IF NOT EXISTS workspace_config JSONB;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS appointment_at TIMESTAMPTZ;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS appointment_end TIMESTAMPTZ;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS request_kind TEXT NOT NULL DEFAULT 'consultation';
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS service_label TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS quoted_price INTEGER CHECK (quoted_price >= 0);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS quote_note TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE INDEX IF NOT EXISTS bookings_appointment_idx ON bookings(office_id, appointment_at);
+CREATE TABLE IF NOT EXISTS calendar_blocks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  office_id BIGINT NOT NULL REFERENCES offices(id) ON DELETE CASCADE,
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL,
+  released_at TIMESTAMPTZ,
+  CHECK (ends_at > starts_at)
+);
 `;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
