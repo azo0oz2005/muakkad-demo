@@ -43,7 +43,7 @@ module.exports = function mountWorkspace(app, { pool, query, loadOffice, safeOff
       const result = await client.query(`INSERT INTO bookings (office_id,ref,case_type,summary,client_name,client_phone,preferred_day,preferred_period,
         appointment_at,appointment_end,request_kind,service_label,quoted_price,is_test,status,last_step,session_hash)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'awaiting_payment',5,$15) RETURNING id,ref`,
-        [office.id,shortRef(),kind==='consultation'?caseType:'other',cleanText(req.body.summary,300)||null,name,phone,req.body.day||null,slot?.time||null,
+        [office.id,shortRef(),kind==='consultation'?caseType:'other',cleanText(req.body.summary,300)||null,name,phone,kind==='consultation'?req.body.day:null,slot?.time||null,
           slot?.start||null,slot?.end||null,kind,kind==='service'?service:null,kind==='consultation'?office.price:null,!!office.workspace_config.testMode,requestKey]);
       await client.query("INSERT INTO events (office_id,type,step,session_hash) VALUES ($1,'submitted',5,$2)",[office.id,sessionHash]);
       await client.query('COMMIT'); res.status(201).json(result.rows[0]);
