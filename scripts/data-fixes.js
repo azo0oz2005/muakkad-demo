@@ -5,6 +5,12 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // المالك طلب إبقاء كلمة المرور المسلّمة لآل جابر دون فرض تغييرها.
+    id: '2026-10-01-aljaber-keep-issued-password',
+    run: (c) => c.query(`UPDATE users SET must_change_password=FALSE
+      WHERE office_id=(SELECT id FROM offices WHERE slug='aljaber') AND role='lawyer'`)
+  },
+  {
     // بيانات المكتب من دليل الهيئة السعودية للمحامين؛ الإعدادات أمثلة للمراجعة.
     id: '2026-09-30-shathri-preview',
     run: (c) => c.query(`INSERT INTO offices
