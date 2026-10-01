@@ -18,7 +18,7 @@ const {pool}=require('../src/db');
   const password='Aj-'+crypto.randomBytes(12).toString('base64url');
   await c.query("UPDATE users SET password_hash=$1,must_change_password=TRUE,failed_attempts=0,locked_until=NULL WHERE office_id=$2 AND role='lawyer'",[await bcrypt.hash(password,12),office.id]);
   // Invalidate existing office sessions; unrelated office sessions stay intact.
-  await c.query(`UPDATE session SET sess=sess-'user' WHERE sess->'user'->>'officeId'=$1`,[String(office.id)]);
+  await c.query(`UPDATE session SET sess=(sess::jsonb-'user')::json WHERE sess->'user'->>'officeId'=$1`,[String(office.id)]);
   await c.query("UPDATE offices SET trial_ends_at=NOW()+INTERVAL '14 days',plan_status='trial',active=TRUE,periods='[\"08:00–23:00\"]',all_days=TRUE,updated_at=NOW() WHERE id=$1",[office.id]);
   await c.query('COMMIT');console.log(JSON.stringify({resetId,backedUp:counts,email:'aljaber@muakkad.sa',password}));
  }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();await pool.end();}
