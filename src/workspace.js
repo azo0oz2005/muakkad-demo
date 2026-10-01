@@ -15,11 +15,15 @@ module.exports = function mountWorkspace(app, { pool, query, loadOffice, safeOff
   }
   app.get('/api/public/:slug/slots', async (req,res) => {
     const office = await loadOffice(req.params.slug); const day = String(req.query.day || '');
-    if (!office?.active || !office.workspace_config?.enabled || !validDay(day)) return res.status(400).json({error:'اختر يومًا متاحًا خلال 30 يومًا.'});
+    if (!office?.active || office.plan_status==='paused' || !office.workspace_config?.enabled) return res.status(404).json({error:'المكتب غير موجود أو الخدمة غير متاحة.'});
+    if (!validDay(day)) return res.status(400).json({error:'اختر يومًا متاحًا خلال 30 يومًا.'});
     res.json(slotsFor(office,day,await occupied(pool,office.id,day)));
   });
   app.post('/api/public/:slug/request', submitLimiter, async (req,res) => {
+    const publicOffice=await loadOffice(req.params.slug);
+    if(!publicOffice?.active || publicOffice.plan_status==='paused' || !publicOffice.workspace_config?.enabled) return res.status(404).json({error:'المكتب غير موجود أو الخدمة غير متاحة.'});
     if (req.body.website) return res.status(400).json({error:'طلب غير صالح.'});
+    if ([req.body.clientName,req.body.summary].some(x=>/<[^>]*>/.test(String(x||'')))) return res.status(400).json({error:'اكتب الاسم والملخص كنص عادي بدون أكواد.'});
     const name = cleanText(req.body.clientName,60); const phone = normalizePhone(req.body.clientPhone);
     const sessionHash = cleanText(req.body.sessionHash,80); const kind = req.body.kind;
     if (name.length < 2 || !phone || sessionHash.length < 12 || req.body.consent !== true || !['consultation','service'].includes(kind)) return res.status(400).json({error:'راجع الاسم والجوال والموافقة.'});
@@ -27,7 +31,7 @@ module.exports = function mountWorkspace(app, { pool, query, loadOffice, safeOff
     try {
       await client.query('BEGIN');
       const office = (await client.query('SELECT * FROM offices WHERE slug=$1 FOR UPDATE',[req.params.slug])).rows[0];
-      if (!office?.active || office.preview_only || !office.workspace_config?.enabled) { await client.query('ROLLBACK'); return res.status(404).json({error:'الخدمة غير متاحة.'}); }
+      if (!office?.active || office.plan_status==='paused' || office.preview_only || !office.workspace_config?.enabled) { await client.query('ROLLBACK'); return res.status(404).json({error:'الخدمة غير متاحة.'}); }
       const requestKey = cleanText(req.body.requestKey,80);
       if (requestKey.length < 12) { await client.query('ROLLBACK'); return res.status(400).json({error:'حدّث الصفحة وأعد المحاولة.'}); }
       const existing = (await client.query('SELECT id,ref FROM bookings WHERE office_id=$1 AND session_hash=$2',[office.id,requestKey])).rows[0];
@@ -40,6 +44,9 @@ module.exports = function mountWorkspace(app, { pool, query, loadOffice, safeOff
         slot = slotsFor(office,day,await occupied(client,office.id,day)).find(x=>x.time === req.body.time && x.available);
         if (!slot) { await client.query('ROLLBACK'); return res.status(409).json({error:'الوقت حُجز أو لم يعد متاحًا. اختر وقتًا آخر.'}); }
       } else if (!office.workspace_config.services.includes(service)) { await client.query('ROLLBACK'); return res.status(400).json({error:'اختر خدمة من القائمة.'}); }
+      const pending=await client.query(`SELECT 1 FROM bookings WHERE office_id=$1 AND client_phone=$2 AND request_kind=$3
+        AND status='awaiting_payment' AND (appointment_end>NOW() OR request_kind='service') LIMIT 1`,[office.id,phone,kind]);
+      if(pending.rowCount) { await client.query('ROLLBACK');return res.status(429).json({error:'عندك طلب بانتظار التأكيد. تواصل مع المكتب لتأكيده أو إلغائه قبل طلب جديد.'}); }
       const result = await client.query(`INSERT INTO bookings (office_id,ref,case_type,summary,client_name,client_phone,preferred_day,preferred_period,
         appointment_at,appointment_end,request_kind,service_label,quoted_price,is_test,status,last_step,session_hash)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'awaiting_payment',5,$15) RETURNING id,ref`,

@@ -95,7 +95,8 @@ function safeOffice(row) {
   return {
     slug: row.slug, name: row.name, logoUrl: row.logo_url, brandColors: row.brand_colors,
     whatsapp: row.whatsapp, price: row.price, duration: row.duration_min,
-    times: row.periods, allDays: row.all_days, caseTypes: row.case_types,
+    times: row.workspace_config?.enabled ? [`${row.workspace_config.start}–${row.workspace_config.end}`] : row.periods,
+    allDays: row.workspace_config?.enabled ? row.workspace_config.days.length===7 : row.all_days, caseTypes: row.case_types,
     bankName: row.bank_name, accountName: row.account_name, iban: row.iban,
     cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only,
     workspace: row.workspace_config
@@ -414,6 +415,9 @@ app.get('/:slug', async (req, res, next) => {
 });
 
 app.use((error, _req, res, _next) => {
+  if(error.type==='entity.parse.failed') return res.status(400).json({error:'صيغة JSON غير صالحة.'});
+  if(error.type==='entity.too.large') return res.status(413).json({error:'حجم الطلب أكبر من المسموح.'});
+  if(error.code==='22P02') return res.status(400).json({error:'معرّف الطلب غير صالح.'});
   console.error(error);
   res.status(500).json({ error: 'حدث خطأ غير متوقع.' });
 });
