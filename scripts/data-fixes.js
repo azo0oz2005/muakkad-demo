@@ -5,6 +5,18 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // Public office identity; fees, duration and availability await approval.
+    id: '2026-10-04-alomary-preview',
+    run: (c) => c.query(`INSERT INTO offices
+      (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only)
+      VALUES ('alomary','مكتب المحامي سليمان بن يوسف العمري',
+      '/platform/alomary/name-mark.svg','966537778130',0,30,
+      '["يحددها المكتب"]',TRUE,
+      '{"commercial":"القضايا التجارية","intellectual":"الملكية الفكرية","arbitration":"التحكيم التجاري والوساطة والتسوية الودية","other":"أخرى"}',
+      'السعر والمدة والأوقات وسياسة الإلغاء تُعتمد مع المكتب قبل التفعيل.',TRUE)
+      ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
     // Public identity from al-tayyar.com.sa; price and duration are unpublished.
     id: '2026-10-04-atyar-preview',
     run: (c) => c.query(`INSERT INTO offices

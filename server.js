@@ -402,6 +402,16 @@ app.get('/:slug', async (req, res, next) => {
     config.durationLabel = 'يحددها المكتب';
     config.draftMessage = 'نسخة مبدئية للمراجعة — السعر والمدة ينتظران اعتماد المكتب. الفترات حسب ساعات العمل المنشورة. الحجز والدفع غير مفعّلين.';
   }
+  if (office.slug === 'alomary' && office.preview_only) {
+    config.priceLabel = 'يحددها المكتب';
+    config.durationLabel = 'يحددها المكتب';
+    config.draftMessage = 'نسخة تجريبية للمراجعة — السعر والمدة والأوقات تنتظر اعتماد المكتب. الحجز والدفع غير مفعّلين.';
+    const deadline = { id: 'deadline', label: 'هل توجد مهلة أو جلسة قريبة؟', options: ['لا', 'خلال أسبوع', 'خلال شهر', 'لا أعرف'] };
+    config.screening = {
+      intellectual: [{ id: 'kind', label: 'نوع الموضوع؟', options: ['علامة تجارية', 'حقوق مؤلف', 'براءة اختراع', 'أخرى'] }, deadline],
+      arbitration: [{ id: 'kind', label: 'الخدمة المطلوبة؟', options: ['تحكيم تجاري', 'وساطة', 'تسوية ودية'] }, { id: 'agreement', label: 'هل يوجد اتفاق تحكيم مكتوب؟', options: ['نعم', 'لا', 'غير متأكد'] }, deadline]
+    };
+  }
   const officeName = escapeHtml(cleanText(office.name,140));
   html = html
     .replaceAll('مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية', officeName)
@@ -409,12 +419,21 @@ app.get('/:slug', async (req, res, next) => {
     .replaceAll('logo-mark.png', office.logo_url || '/hamad/logo-mark.png')
     .replace('href="../styles.css?v=4"','href="/styles.css?v=5"')
     .replace('href="hamad.css?v=2"','href="/hamad/hamad.css?v=3"')
-    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=7"></script>`)
+    .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=8"></script>`)
     .replace('لا تُحفظ بياناتك على أي خادم في هذه الصفحة، ونستخدم إحصاءً مجهولًا لعدد الزيارات فقط بدون كوكيز. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.', 'تُحفظ بيانات الطلب بأقل قدر لازم لتأكيد الاستشارة ومتابعتها، ثم تُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع.')
     .replace('</form>', '<label class="sr-only">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>');
   if (office.slug === 'alogla') {
     html = html.replaceAll('حمد بن عواد الشريف', 'علي العقلا').replaceAll('المدينة المنورة', 'الرياض')
       .replace('</head>', '<style>.brand-logo{width:110px;height:auto;max-width:30vw}.offer-logo{width:120px;height:auto;max-width:28vw;object-fit:contain}</style></head>');
+  }
+  if (office.slug === 'alomary') {
+    html = html.replaceAll('حمد بن عواد الشريف', 'سليمان بن يوسف العمري').replaceAll('المدينة المنورة', 'الرياض')
+      .replaceAll('<span data-price></span> <small>ر.س</small>', '<span data-price></span>')
+      .replaceAll('<span data-duration></span> <small>دقيقة</small>', '<span data-duration></span>')
+      .replaceAll('<span data-price></span> ر.س', '<span data-price></span>')
+      .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
+      .replace(/(<fieldset class="case-grid"[^>]*>)[\s\S]*?(<\/fieldset>)/, (_, start, end) => start + Object.entries(office.case_types).map(([key, label]) => `<label class="case-card"><input type="radio" name="caseType" value="${escapeHtml(key)}"><b>${escapeHtml(label)}</b></label>`).join('') + end)
+      .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');
   }
   if (office.slug === 'atyar') {
     html = html.replaceAll('حمد بن عواد الشريف', 'شركة أطيار').replaceAll('المدينة المنورة', 'الرياض والخبر')

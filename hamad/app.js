@@ -70,6 +70,9 @@ const SCREENING = {
   ]
 };
 
+if (OFFICE.caseTypes) Object.assign(CASE_TYPES, OFFICE.caseTypes);
+if (OFFICE.screening) Object.assign(SCREENING, OFFICE.screening);
+
 /* ================= أدوات ================= */
 const $ = (id) => document.getElementById(id);
 const radio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
