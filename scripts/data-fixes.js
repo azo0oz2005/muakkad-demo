@@ -5,6 +5,19 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // Public identity from al-tayyar.com.sa; price and duration are unpublished.
+    id: '2026-10-04-atyar-preview',
+    run: (c) => c.query(`INSERT INTO offices
+      (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only,brand_colors)
+      VALUES ('atyar','شركة أطيار للمحاماة والاستشارات القانونية',
+      '/platform/atyar/logo.png','966555398969',0,30,
+      '["صباحًا (8–12)","ظهرًا (12–4)"]',FALSE,
+      '{"labor":"عمالية","enforcement":"تنفيذ ومطالبات","commercial":"تجارية","realestate":"عقارية","family":"أحوال شخصية","other":"أخرى"}',
+      'السعر والمدة وسياسة الإلغاء تنتظر اعتماد المكتب. الفترات مستندة إلى ساعات العمل المنشورة وليست مواعيد مؤكدة.',TRUE,
+      '{"ink":"#5a3b17","accent":"#ab711a"}')
+      ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
     // المالك طلب إبقاء كلمة المرور المسلّمة لآل جابر دون فرض تغييرها.
     id: '2026-10-01-aljaber-keep-issued-password',
     run: (c) => c.query(`UPDATE users SET must_change_password=FALSE

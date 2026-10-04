@@ -104,12 +104,12 @@ function workingDays(from, count) {
 }
 
 /* ================= تعبئة إعدادات المكتب ================= */
-document.querySelectorAll('[data-price]').forEach((el) => { el.textContent = OFFICE.price; });
-document.querySelectorAll('[data-duration]').forEach((el) => { el.textContent = OFFICE.duration; });
+document.querySelectorAll('[data-price]').forEach((el) => { el.textContent = OFFICE.priceLabel || OFFICE.price; });
+document.querySelectorAll('[data-duration]').forEach((el) => { el.textContent = OFFICE.durationLabel || OFFICE.duration; });
 $('cancelPolicy').textContent = OFFICE.cancelPolicy + ' (قد يحدد المكتب سياسة مختلفة عند تأكيد الموعد.)';
 $('draftRibbon').hidden = !OFFICE.draft;
 if (OFFICE.draft) {
-  $('draftRibbon').textContent = 'نسخة للمراجعة فقط — 250 ريال و30 دقيقة والأوقات أمثلة، لم يعتمدها المكتب. الحجز والدفع غير مفعّلين.';
+  $('draftRibbon').textContent = OFFICE.draftMessage || 'نسخة للمراجعة فقط — 250 ريال و30 دقيقة والأوقات أمثلة، لم يعتمدها المكتب. الحجز والدفع غير مفعّلين.';
   $('sendBtn').textContent = 'الحجز غير مفعّل — نسخة للمراجعة';
   $('sendBtn').disabled = true;
 }
@@ -306,7 +306,7 @@ function updateSummary() {
   $('sumSlot').textContent = slot || 'لم يُحدد';
   const mini = $('miniSummary');
   mini.hidden = !type || current === 6;
-  mini.textContent = [type, slot, type ? `${OFFICE.price} ر.س` : ''].filter(Boolean).join(' · ');
+  mini.textContent = [type, slot, type ? (OFFICE.priceLabel || `${OFFICE.price} ر.س`) : ''].filter(Boolean).join(' · ');
 }
 
 function resetForm() {
