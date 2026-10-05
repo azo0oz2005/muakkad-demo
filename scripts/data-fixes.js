@@ -5,13 +5,6 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
-    // Owner requested sample fees and the original logo from wasmalbayan.com.
-    id: '2026-10-05-abdulmajeed-logo-sample-fees',
-    run: (c) => c.query(`UPDATE offices SET
-      logo_url='/platform/abdulmajeed/logo.png',price=250,duration_min=30,updated_at=NOW()
-      WHERE slug='abdulmajeed' AND preview_only=TRUE`)
-  },
-  {
     // Name and phone supplied by the owner; commercial settings await approval.
     id: '2026-10-05-abdulmajeed-preview',
     run: (c) => c.query(`INSERT INTO offices
@@ -22,6 +15,13 @@ const FIXES = [
       '{"labor":"عمالية","enforcement":"تنفيذ ومطالبات","commercial":"تجارية","realestate":"عقارية","family":"أحوال شخصية","other":"أخرى"}',
       'السعر والمدة والأوقات وسياسة الإلغاء تُعتمد مع المكتب قبل التفعيل.',TRUE)
       ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
+    // Owner requested sample fees and the original logo from wasmalbayan.com.
+    id: '2026-10-05-abdulmajeed-logo-sample-fees',
+    run: (c) => c.query(`UPDATE offices SET
+      logo_url='/platform/abdulmajeed/logo.png',price=250,duration_min=30,updated_at=NOW()
+      WHERE slug='abdulmajeed' AND preview_only=TRUE`)
   },
   {
     // Public office identity; fees, duration and availability await approval.
