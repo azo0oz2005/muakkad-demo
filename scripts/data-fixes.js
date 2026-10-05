@@ -32,6 +32,13 @@ const FIXES = [
       WHERE slug='abdulmajeed'`)
   },
   {
+    // Use the exact replacement image supplied by the owner.
+    id: '2026-10-05-abdulmajeed-replacement-logo',
+    run: (c) => c.query(`UPDATE offices SET
+      logo_url='/platform/abdulmajeed/logo-final.jpg',updated_at=NOW()
+      WHERE slug='abdulmajeed'`)
+  },
+  {
     // Public office identity; fees, duration and availability await approval.
     id: '2026-10-04-alomary-preview',
     run: (c) => c.query(`INSERT INTO offices
