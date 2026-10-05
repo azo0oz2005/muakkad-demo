@@ -5,6 +5,18 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // Name and phone supplied by the owner; commercial settings await approval.
+    id: '2026-10-05-abdulmajeed-preview',
+    run: (c) => c.query(`INSERT INTO offices
+      (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only)
+      VALUES ('abdulmajeed','المحامي عبدالمجيد',
+      '/platform/abdulmajeed/name-mark.svg','966533895044',0,30,
+      '["يحددها المكتب"]',TRUE,
+      '{"labor":"عمالية","enforcement":"تنفيذ ومطالبات","commercial":"تجارية","realestate":"عقارية","family":"أحوال شخصية","other":"أخرى"}',
+      'السعر والمدة والأوقات وسياسة الإلغاء تُعتمد مع المكتب قبل التفعيل.',TRUE)
+      ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
     // Public office identity; fees, duration and availability await approval.
     id: '2026-10-04-alomary-preview',
     run: (c) => c.query(`INSERT INTO offices

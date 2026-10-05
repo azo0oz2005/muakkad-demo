@@ -397,6 +397,11 @@ app.get('/:slug', async (req, res, next) => {
   }
   let html = fs.readFileSync(path.join(root,'hamad','index.html'),'utf8');
   const config = safeOffice(office);
+  if (office.slug === 'abdulmajeed' && office.preview_only) {
+    config.priceLabel = 'يحددها المكتب';
+    config.durationLabel = 'يحددها المكتب';
+    config.draftMessage = 'نسخة تجريبية للمراجعة — السعر والمدة والأوقات تنتظر اعتماد المكتب. الحجز والدفع غير مفعّلين.';
+  }
   if (office.slug === 'atyar' && office.preview_only) {
     config.priceLabel = 'يحددها المكتب';
     config.durationLabel = 'يحددها المكتب';
@@ -433,6 +438,14 @@ app.get('/:slug', async (req, res, next) => {
       .replaceAll('<span data-price></span> ر.س', '<span data-price></span>')
       .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
       .replace(/(<fieldset class="case-grid"[^>]*>)[\s\S]*?(<\/fieldset>)/, (_, start, end) => start + Object.entries(office.case_types).map(([key, label]) => `<label class="case-card"><input type="radio" name="caseType" value="${escapeHtml(key)}"><b>${escapeHtml(label)}</b></label>`).join('') + end)
+      .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');
+  }
+  if (office.slug === 'abdulmajeed') {
+    html = html.replaceAll('حمد بن عواد الشريف', 'عبدالمجيد').replaceAll(' · المدينة المنورة', '')
+      .replaceAll('<span data-price></span> <small>ر.س</small>', '<span data-price></span>')
+      .replaceAll('<span data-duration></span> <small>دقيقة</small>', '<span data-duration></span>')
+      .replaceAll('<span data-price></span> ر.س', '<span data-price></span>')
+      .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
       .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');
   }
   if (office.slug === 'atyar') {
