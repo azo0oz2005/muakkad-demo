@@ -5,14 +5,6 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
-    // Replace the inferred company logo with the owner's supplied personal logo.
-    id: '2026-10-05-abdulmajeed-personal-logo',
-    run: (c) => c.query(`UPDATE offices SET
-      logo_url='/platform/abdulmajeed/logo-clean.png',
-      brand_colors='{"ink":"#27313d","accent":"#68727e"}',updated_at=NOW()
-      WHERE slug='abdulmajeed'`)
-  },
-  {
     // Name and phone supplied by the owner; commercial settings await approval.
     id: '2026-10-05-abdulmajeed-preview',
     run: (c) => c.query(`INSERT INTO offices
@@ -30,6 +22,14 @@ const FIXES = [
     run: (c) => c.query(`UPDATE offices SET
       logo_url='/platform/abdulmajeed/logo.png',price=250,duration_min=30,updated_at=NOW()
       WHERE slug='abdulmajeed' AND preview_only=TRUE`)
+  },
+  {
+    // Replace the inferred company logo with the owner's supplied personal logo.
+    id: '2026-10-05-abdulmajeed-personal-logo',
+    run: (c) => c.query(`UPDATE offices SET
+      logo_url='/platform/abdulmajeed/logo-clean.png',
+      brand_colors='{"ink":"#27313d","accent":"#68727e"}',updated_at=NOW()
+      WHERE slug='abdulmajeed'`)
   },
   {
     // Public office identity; fees, duration and availability await approval.
