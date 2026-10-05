@@ -5,6 +5,14 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // Replace the inferred company logo with the owner's supplied personal logo.
+    id: '2026-10-05-abdulmajeed-personal-logo',
+    run: (c) => c.query(`UPDATE offices SET
+      logo_url='/platform/abdulmajeed/logo-clean.png',
+      brand_colors='{"ink":"#27313d","accent":"#68727e"}',updated_at=NOW()
+      WHERE slug='abdulmajeed'`)
+  },
+  {
     // Name and phone supplied by the owner; commercial settings await approval.
     id: '2026-10-05-abdulmajeed-preview',
     run: (c) => c.query(`INSERT INTO offices

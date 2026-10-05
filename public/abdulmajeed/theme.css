@@ -1,0 +1,18 @@
+/* Palette from the owner's slate navy and silver logo. */
+:root{--ink:#27313d;--ink-2:#394450;--copper:#68727e;--copper-2:#515b67;--paper:#f3f4f5;--mist:#e5e7ea;--line:#d3d7dc;--muted:#606974;--focus:#68727e}
+body{background:radial-gradient(900px 420px at 85% -80px,rgba(39,49,61,.09),transparent 70%),var(--paper)}
+.draft-ribbon{background:#e7e9ec;color:#394450;border-bottom-color:#ccd1d7}
+.offer-box{background:linear-gradient(160deg,#394450,#27313d)}
+.offer-facts div:first-child dd{color:#e5e6e8}
+.offer-box #startBtn{background:#f4f4f4;color:#27313d}
+.offer-box #startBtn:hover{background:#dedfe1}
+.brand-logo{width:64px;height:64px;object-fit:contain}
+.offer-logo{width:96px;height:96px;object-fit:contain}
+.file-tab{background:#27313d;color:#e5e6e8}
+.pay-info{background:#e9ecf0}
+.case-card:has(input:checked){background:#eef0f2}
+.chips input:checked+span,.times input:checked+span{background:#27313d;border-color:#27313d}
+.pay,.wa-send{background:#27313d}
+.pay:hover,.wa-send:hover{background:#394450}
+input,textarea,select{font-size:16px}
+@media(max-width:640px){.brand-logo{width:56px;height:56px}.offer-logo{width:84px;height:84px}}

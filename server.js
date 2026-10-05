@@ -441,7 +441,7 @@ app.get('/:slug', async (req, res, next) => {
   if (office.slug === 'abdulmajeed') {
     html = html.replaceAll('حمد بن عواد الشريف', 'عبدالمجيد').replaceAll(' · المدينة المنورة', '')
       .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
-      .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');
+      .replace('</head>', '<link rel="stylesheet" href="/platform/abdulmajeed/theme.css?v=1"></head>');
   }
   if (office.slug === 'atyar') {
     html = html.replaceAll('حمد بن عواد الشريف', 'شركة أطيار').replaceAll('المدينة المنورة', 'الرياض والخبر')
