@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="مؤكّد: حوّل استفسارات واتساب إلى استشارات مدفوعة ومواعيد مؤكدة.">
   <meta property="og:title" content="مؤكّد | من استفسار واتساب إلى موعد مدفوع">
-  <meta property="og:description" content="رابط باسم مكتبك يفرز الطلب، يحصّل قيمة الاستشارة، ويتابع من بدأ ولم يكمل.">
+  <meta property="og:description" content="رابط باسم مكتبك ينظّم الطلب والموعد، والدفع لحساب المكتب مباشرة.">
   <meta property="og:type" content="website">
   <title>مؤكّد | من استفسار واتساب إلى موعد مدفوع</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
-<body>
+<body><a class="skip-link" href="#demoView">انتقل للمحتوى</a>
   <header class="topbar">
     <a class="brand" id="brandLink" href="#demo" aria-label="مؤكّد — عرض المنتج">
       <span class="brand-mark" id="brandMark" aria-hidden="true">م</span>
       <span><strong id="brandName">مؤكّد</strong><small id="brandTagline">من استفسار واتساب إلى موعد مدفوع</small></span>
     </a>
-    <nav class="top-nav" id="topNav" aria-label="التنقل بين الأوضاع"></nav>
+    <nav class="review-nav" aria-label="التنقل الرئيسي"><a class="nav-login" href="https://muakkad-platform.onrender.com/login">تسجيل الدخول</a></nav><nav class="top-nav" id="topNav" aria-label="التنقل بين الأوضاع"></nav>
   </header>
 
 
@@ -62,7 +62,7 @@
         <form id="intakeForm" novalidate>
           <!-- 1 -->
           <section class="step active" data-step="1" aria-labelledby="h1s">
-            <h2 id="h1s" tabindex="-1">إيش نوع القضية؟</h2>
+            <h2 id="h1s" tabindex="-1">ما نوع القضية؟</h2>
             <p class="hint">اختر الأقرب لموضوعك.</p>
             <fieldset class="case-grid" aria-describedby="typeError">
               <legend class="sr-only">نوع القضية</legend>
@@ -79,13 +79,13 @@
           <!-- 2 -->
           <section class="step" data-step="2" aria-labelledby="h2s">
             <h2 id="h2s" tabindex="-1">أسئلة فرز سريعة</h2>
-            <p class="hint">اختيارات قصيرة تساعد المحامي يجهز للاستشارة.</p>
+            <p class="hint">أسئلة قصيرة تساعد المحامي على الاستعداد للاستشارة.</p>
             <div id="screening"></div>
             <label class="field" for="caseDetails"><span>ملخص مختصر <em>(اختياري)</em></span>
               <textarea id="caseDetails" rows="3" maxlength="300" aria-describedby="sensitiveNote charHint" placeholder="مثال: انتهى عقدي قبل شهرين ولم أستلم مكافأة نهاية الخدمة."></textarea>
               <small id="charHint"><b id="charCount">0</b> / 300</small>
             </label>
-            <p class="notice" id="sensitiveNote">لا تكتب بيانات شخصية حساسة أو ترفع مستندات. التفاصيل الكاملة تناقش مع المحامي أثناء الاستشارة.</p>
+            <p class="notice" id="sensitiveNote">لا تكتب بيانات شخصية حساسة أو ترفع مستندات. تُناقَش التفاصيل الكاملة مع المحامي أثناء الاستشارة.</p>
           </section>
 
           <!-- 3 -->
@@ -171,49 +171,38 @@
   </main>
 
   <!-- ============ عرض المنتج للمحامي ============ -->
-  <main id="demoView" hidden>
-    <section class="pitch" aria-labelledby="pitchTitle">
-      <p class="eyebrow">مؤكّد للمحامين</p>
-      <h1 id="pitchTitle">خلّ كل استشارة تبدأ بالدفع</h1>
-      <p class="pitch-lead">أرسل رابطك للمستفسر. يوضح طلبه، يختار موعده، ويدفع قبل التأكيد.</p>
-      <ol class="pitch-steps">
-        <li><b aria-hidden="true">✓</b><span>أسئلة قصيرة حسب نوع القضية</span></li>
-        <li><b aria-hidden="true">✓</b><span>الدفع قبل تأكيد الموعد</span></li>
-        <li><b aria-hidden="true">✓</b><span>متابعة اللي بدأوا وما كملوا</span></li>
-      </ol>
-      <div class="pitch-actions">
-        <a class="primary" href="#client">جرّب الرابط كعميل</a>
-        <a class="quiet-link" href="#office">شاهد لوحة المكتب</a>
+  <main id="demoView" hidden tabindex="-1">
+    <section class="proposal-hero" aria-labelledby="pitchTitle">
+      <div class="proposal-copy">
+        <p class="proposal-label">تنظيم الاستشارات للمحامين</p>
+        <h1 id="pitchTitle">استشارات مكتبك،<br><span>بموعد ودفع واضح.</span></h1>
+        <p class="proposal-lead">أرسل رابط مكتبك للعميل. يختار موعدًا، ويحوّل قيمة الاستشارة إلى حسابك. تراجع الطلب وتؤكّد الموعد.</p>
+        <div class="proposal-actions"><a class="primary" id="trialCta" href="#" data-open="trialDialog" data-wa-text="السلام عليكم، أود تجربة مؤكّد لمكتبي لمدة 14 يومًا.">اطلب تجربة لمكتبك</a></div>
+        <p class="proposal-fine">١٤ يومًا دون التزام. نتواصل معك عبر واتساب لتجهيز الرابط.</p>
+      </div>
+      <div class="product-stage" aria-label="مثال على طلب استشارة">
+        <div class="stage-top"><span>مثال على ما يظهر في مكتبك</span></div>
+        <div class="booking-paper">
+          <div class="paper-office"><span class="office-monogram" aria-hidden="true">أ</span><div><strong>مكتب أُفق للمحاماة</strong><small>مكتب تجريبي</small></div></div>
+          <h2 class="simple-request-title">طلب استشارة عمالية</h2>
+          <dl class="simple-request"><div><dt>الموعد المطلوب</dt><dd>الأحد · الفترة المسائية</dd></div><div><dt>قيمة الاستشارة</dt><dd>٢٥٠ ريالًا</dd></div><div><dt>حالة الطلب</dt><dd>بانتظار التحويل</dd></div></dl>
+          <p class="simple-payment-note">تؤكّد الدفع بعد وصول الحوالة إلى حساب مكتبك.</p>
+        </div>
+        <a class="simple-demo-link" href="#client">شاهد خطوات الحجز للعميل <span aria-hidden="true">←</span></a>
       </div>
     </section>
-
-    <div class="pitch-grid simple">
-      <section class="pitch-card result-card" aria-labelledby="resTitle">
-        <h2 id="resTitle">كل شيء واضح للمكتب <span class="demo-badge">مثال تجريبي</span></h2>
-        <dl class="mini-stats">
-          <div><dt>فتحوا الرابط</dt><dd id="dmOpens"></dd></div>
-          <div><dt>بدأوا الطلب</dt><dd id="dmStarted"></dd></div>
-          <div><dt>دفعوا</dt><dd id="dmPaid"></dd></div>
-          <div class="money"><dt>دخل من الرابط</dt><dd id="dmRevenue"></dd></div>
-        </dl>
-      </section>
-    </div>
-
-    <section class="trial" aria-labelledby="trialTitle">
-      <div>
-        <h2 id="trialTitle">اختبار 14 يومًا</h2>
-        <p>رابط باسمك وسعرك. جرّبه مع عملائك 14 يومًا بدون التزام.</p>
-      </div>
-      <a class="primary wa-cta" id="trialCta" href="#" data-open="trialDialog" data-wa-text="السلام عليكم، شفت مؤكّد وأبغى أجربه على مكتبي 14 يوم." data-wa-label="ابدأ تجربة المكتب على واتساب">ابدأ تجربة المكتب</a>
-    </section>
+    <div class="simple-assurance"><strong>الدفع إلى حسابك مباشرة.</strong><span>لا عمولة على الاستشارات.</span></div>
+    <section class="simple-how" aria-labelledby="workflowTitle"><h2 id="workflowTitle">كيف يعمل مؤكّد؟</h2><ol><li><strong>أرسل الرابط</strong><span>رابط باسم مكتبك وسعر استشارتك.</span></li><li><strong>استقبل الطلب</strong><span>يحدد العميل نوع الاستشارة والموعد.</span></li><li><strong>أكّد الموعد</strong><span>بعد التحقق من وصول الحوالة لحسابك.</span></li></ol></section>
+    <div hidden aria-hidden="true"><span id="dmOpens"></span><span id="dmStarted"></span><span id="dmPaid"></span><span id="dmRevenue"></span></div>
   </main>
+
 
   <!-- ============ لوحة المكتب ============ -->
   <main id="officeView" hidden>
     <div class="office-head">
       <div>
         <p class="eyebrow">لوحة المكتب التجريبية</p>
-        <h1 class="office-title">كم دخل لك من الرابط؟</h1>
+        <h1 class="office-title">إيرادات الاستشارات</h1>
       </div>
       <span class="demo-badge">بيانات تجريبية</span>
     </div>
@@ -230,7 +219,7 @@
     <div class="board">
       <section aria-labelledby="incTitle">
         <h2 id="incTitle">طلبات غير مكتملة <span class="count" id="incCount"></span></h2>
-        <p class="hint">بدأوا الحجز وما دفعوا. تابعهم برسالة جاهزة.</p>
+        <p class="hint">طلبات لم يكتمل دفعها. يمكنك متابعة أصحابها برسالة جاهزة.</p>
         <div id="incompleteList" class="cards"></div>
       </section>
       <section aria-labelledby="paidTitle">
@@ -257,7 +246,7 @@
     <h3>ما لا نطلبه</h3>
     <p>لا نطلب رقم الهوية أو رقم القضية أو أسماء الخصوم أو أي مستندات.</p>
     <h3>مدة الاحتفاظ</h3>
-    <p>مدة تجريبية مقترحة: 30 يومًا ثم تُحذف. هذا النموذج التجريبي لا يرسل بيانات إلى أي خادم؛ كل شيء يُحفظ في متصفحك فقط.</p>
+    <p>مدة تجريبية مقترحة: 30 يومًا ثم تُحذف. هذا النموذج التجريبي لا يرسل بيانات إلى أي خادم؛ تُحفظ البيانات في متصفحك فقط.</p>
     <h3>سياسة إلغاء نموذجية</h3>
     <p>الإلغاء قبل الموعد بـ 24 ساعة: استرداد كامل أو إعادة جدولة. أقل من 24 ساعة أو عدم الحضور: لا يُسترد المبلغ. كل مكتب يحدد سياسته الخاصة.</p>
     <p class="demo-warn">هذا النص للعرض فقط، وليس استشارة قانونية ولا سياسة نهائية، ولا يدّعي التوافق النظامي الكامل.</p>
@@ -274,7 +263,7 @@
   <dialog id="trialDialog" aria-labelledby="trialDlgTitle">
     <h2 id="trialDlgTitle">ابدأ تجربة المكتب</h2>
     <p>هذه نسخة عرض. في النسخة الفعلية يتم تجهيز الرابط باسم المكتب وسعر الاستشارة.</p>
-    <button type="button" class="primary" data-close>حسنًا</button>
+    <button type="button" class="primary" data-close>إغلاق</button>
   </dialog>
 
   <dialog id="resetDialog" aria-labelledby="resetTitle">
