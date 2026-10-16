@@ -47,10 +47,11 @@ async function initialize() {
       return;
     }
     if (config.test) {
-      document.querySelectorAll('[data-amount]').forEach((el) => { el.textContent = '200'; });
-      document.querySelector('.price-note').textContent = 'وضع اختبار ميسر: مبلغ ٢٠٠ ريال تجريبي فقط. الاشتراك الحقيقي ٩٩ ريال عند التفعيل.';
+      document.querySelectorAll('[data-test-amount]').forEach((el) => { el.textContent = '200'; });
+      document.querySelectorAll('[data-due-label]').forEach((el) => { el.textContent = 'مبلغ تجربة الدفع في ميسر'; });
+      document.querySelector('.price-note').textContent = 'سعر الاشتراك الحقيقي ٩٩ ريال شهريًا. الدفع الحقيقي يبدأ بعد تفعيل ميسر.';
       document.querySelector('.renewal').textContent = 'الدفع التجريبي ما يفعّل اشتراكًا ولا يخصم مبلغًا حقيقيًا.';
-      message.textContent = 'وضع اختبار ميسر. المبلغ المعروض ٢٠٠ ريال تجريبي عشان اختبار Apple Pay ينجح.';
+      message.textContent = 'وضع اختبار ميسر: مبلغ تجربة الدفع ٢٠٠ ريال تجريبي. سعر الاشتراك ٩٩ ريال شهريًا.';
     }
     if (!config.available) {
       continueButton.disabled = true;

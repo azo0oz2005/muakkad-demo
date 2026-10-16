@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/moyasar-payment-form@2.3.0/dist/moyasar.css">
   <link rel="stylesheet" href="/platform/subscribe.css?v=2">
   <script defer src="https://cdn.jsdelivr.net/npm/moyasar-payment-form@2.3.0/dist/moyasar.umd.min.js"></script>
-  <script defer src="/platform/subscribe.js?v=3"></script>
+  <script defer src="/platform/subscribe.js?v=4"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">انتقل للمحتوى</a>
@@ -46,7 +46,7 @@
           <div class="divider"></div>
           <div class="section-heading payment-heading"><span class="section-number">02</span><div><p>طريقة الدفع</p><h2>ادفع أول شهر</h2></div></div>
           <div class="payment-method"><div><strong>Apple Pay</strong><small>يظهر تأكيد الدفع على جهازك</small></div><span class="method-check" aria-hidden="true">✓</span></div>
-          <div class="due-mobile"><span>المبلغ المستحق اليوم</span><strong><span data-amount>99</span> <small>ر.س</small></strong></div>
+          <div class="due-mobile"><span data-due-label>المبلغ المستحق اليوم</span><strong><span data-test-amount>99</span> <small>ر.س</small></strong></div>
           <button class="apple-button" id="continueButton" type="submit">متابعة إلى الدفع</button>
           <p class="payment-fine">تجديد الاشتراك يدوي. ما راح ينخصم منك مبلغ تلقائي الشهر القادم.</p>
           <p class="form-message" id="formMessage" role="alert" aria-live="polite"></p>
@@ -59,7 +59,7 @@
         <div class="summary-top"><span>اشتراك مكتبك</span><span class="summary-mark" aria-hidden="true">م</span></div>
         <h2 id="summary-title">مؤكّد لمكتبك</h2>
         <p class="summary-description">من رسالة واتساب إلى طلب استشارة وموعد واضح.</p>
-        <div class="price"><strong data-amount>99</strong><span>ر.س<br><small>للشهر الأول</small></span></div>
+        <div class="price"><strong>99</strong><span>ر.س<br><small>شهريًا</small></span></div>
         <p class="price-note">سعر الإطلاق للاشتراك الشهري.</p>
         <div class="summary-rule"></div>
         <h3>يشمل اشتراكك</h3>
@@ -69,7 +69,7 @@
           <li>لوحة للطلبات والمواعيد والمتابعة</li>
           <li>دفع قيمة الاستشارة لحسابك مباشرة</li>
         </ul>
-        <div class="total"><span>المبلغ المستحق اليوم</span><strong><span data-amount>99</span> ر.س</strong></div>
+        <div class="total"><span data-due-label>المبلغ المستحق اليوم</span><strong><span data-test-amount>99</span> ر.س</strong></div>
         <p class="renewal">التجديد يدوي من صفحة الاشتراك. ما فيه خصم تلقائي.</p>
       </aside>
     </div>
