@@ -124,7 +124,7 @@ app.get('/privacy', (_req, res) => res.sendFile(path.join(root, 'public', 'priva
 app.get('/.well-known/apple-developer-merchantid-domain-association', (_req, res) => {
   const associationFile = path.join(root, 'public', '.well-known', 'apple-developer-merchantid-domain-association');
   if (!fs.existsSync(associationFile)) return res.sendStatus(404);
-  res.type('text/plain').sendFile(associationFile);
+  res.type('text/plain').sendFile(associationFile, { dotfiles: 'allow' });
 });
 app.get('/subscribe', (_req, res) => res.sendFile(path.join(root, 'public', 'subscribe.html')));
 
