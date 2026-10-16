@@ -13,6 +13,7 @@ const QRCode = require('qrcode');
 const { rateLimit } = require('express-rate-limit');
 const { pool, query } = require('./src/db');
 const { normalizePhone, shortRef, cleanText, validSlug } = require('./src/utils');
+const { AMOUNT_HALALAS, paymentMatchesOrder, fetchMoyasarPayment } = require('./src/subscriptions');
 
 const app = express();
 const root = __dirname;
@@ -120,6 +121,81 @@ app.get('/health', async (_req, res) => {
 app.get('/', (_req, res) => res.redirect('/demo'));
 app.get('/demo', (_req, res) => res.sendFile(path.join(root, 'index.html')));
 app.get('/privacy', (_req, res) => res.sendFile(path.join(root, 'public', 'privacy.html')));
+app.get('/.well-known/apple-developer-merchantid-domain-association', (_req, res) => {
+  const associationFile = path.join(root, 'public', '.well-known', 'apple-developer-merchantid-domain-association');
+  if (!fs.existsSync(associationFile)) return res.sendStatus(404);
+  res.type('text/plain').sendFile(associationFile);
+});
+app.get('/subscribe', (_req, res) => res.sendFile(path.join(root, 'public', 'subscribe.html')));
+
+function subscriptionGateway() {
+  const publishableKey = process.env.MOYASAR_PUBLISHABLE_KEY || '';
+  const secretKey = process.env.MOYASAR_SECRET_KEY || '';
+  const test = publishableKey.startsWith('pk_test_') && secretKey.startsWith('sk_test_');
+  const live = publishableKey.startsWith('pk_live_') && secretKey.startsWith('sk_live_');
+  const ready = process.env.MOYASAR_APPLE_PAY_DOMAIN_READY === 'true';
+  return { available: ready && (test || live), test, live, publishableKey, secretKey };
+}
+
+app.get('/api/subscriptions/config', (_req, res) => {
+  const gateway = subscriptionGateway();
+  res.json({ available: gateway.available, test: gateway.test, amountHalalas: gateway.test ? 20000 : AMOUNT_HALALAS });
+});
+
+app.get('/api/admin/subscription-orders', requireAuth('owner_admin'), requirePasswordChanged, async (_req, res, next) => {
+  try {
+    const result = await query(`SELECT id,office_name,contact_name,contact_phone,contact_email,
+      amount_halalas,status,payment_id,paid_at,created_at
+      FROM subscription_orders ORDER BY created_at DESC LIMIT 100`);
+    res.json(result.rows);
+  } catch (error) { next(error); }
+});
+
+app.post('/api/subscriptions/orders', submitLimiter, requireCsrf, async (req, res, next) => {
+  try {
+    const gateway = subscriptionGateway();
+    if (!gateway.available) return res.status(503).json({ error: 'الدفع غير متاح الآن. نجهّز تفعيل Apple Pay.' });
+    const officeName = cleanText(req.body.officeName, 100).trim();
+    const contactName = cleanText(req.body.contactName, 100).trim();
+    const contactPhone = normalizePhone(String(req.body.contactPhone || ''));
+    const contactEmail = String(req.body.contactEmail || '').trim().toLowerCase();
+    if (officeName.length < 2 || contactName.length < 2 || !/^\+9665\d{8}$/.test(contactPhone) ||
+      contactEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+      return res.status(400).json({ error: 'راجع اسم المكتب وبيانات التواصل.' });
+    }
+    const amount = gateway.test ? 20000 : AMOUNT_HALALAS;
+    const result = await query(`INSERT INTO subscription_orders
+      (office_name,contact_name,contact_phone,contact_email,amount_halalas)
+      VALUES ($1,$2,$3,$4,$5) RETURNING id`, [officeName, contactName, contactPhone, contactEmail, amount]);
+    res.status(201).json({ orderId: result.rows[0].id, amountHalalas: amount,
+      publishableKey: gateway.publishableKey, test: gateway.test });
+  } catch (error) { next(error); }
+});
+
+app.post('/api/subscriptions/verify', submitLimiter, requireCsrf, async (req, res, next) => {
+  try {
+    const gateway = subscriptionGateway();
+    if (!gateway.available) return res.status(503).json({ error: 'تعذر التحقق من الدفع الآن.' });
+    const orderId = String(req.body.orderId || '');
+    const paymentId = String(req.body.paymentId || '');
+    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuid.test(orderId) || !uuid.test(paymentId)) return res.status(400).json({ error: 'معرّف الدفع غير صالح.' });
+    const result = await query('SELECT id,amount_halalas,status,payment_id FROM subscription_orders WHERE id=$1', [orderId]);
+    const order = result.rows[0];
+    if (!order) return res.status(404).json({ error: 'طلب الاشتراك غير موجود.' });
+    if (order.status !== 'pending') return res.json({ status: order.payment_id === paymentId ? order.status : 'mismatch' });
+    const payment = await fetchMoyasarPayment(paymentId, gateway.secretKey);
+    if (!paymentMatchesOrder(payment, order)) return res.status(400).json({ error: 'لم يتأكد الدفع لهذا الاشتراك.' });
+    const status = gateway.test ? 'test_paid' : 'paid';
+    const updated = await query(`UPDATE subscription_orders SET status=$1,payment_id=$2,paid_at=NOW()
+      WHERE id=$3 AND status='pending' RETURNING id`, [status, paymentId, orderId]);
+    if (!updated.rowCount) return res.json({ status: 'pending' });
+    res.json({ status });
+  } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ error: 'عملية الدفع مرتبطة بطلب آخر.' });
+    next(error);
+  }
+});
 
 app.get('/api/csrf', async (req, res, next) => {
   try {

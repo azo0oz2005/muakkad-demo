@@ -42,6 +42,20 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS subscription_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  office_name TEXT NOT NULL,
+  contact_name TEXT NOT NULL,
+  contact_phone TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  amount_halalas INTEGER NOT NULL CHECK (amount_halalas > 0),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','paid','test_paid')),
+  payment_id UUID UNIQUE,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS subscription_orders_email_idx ON subscription_orders(contact_email, created_at DESC);
+
 CREATE TABLE IF NOT EXISTS bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   office_id BIGINT NOT NULL REFERENCES offices(id) ON DELETE CASCADE,

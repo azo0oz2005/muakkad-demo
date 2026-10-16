@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#112d3d">
+  <title>اشتراك مؤكد | لمكتبك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/moyasar-payment-form@2.3.0/dist/moyasar.css">
+  <link rel="stylesheet" href="subscribe.css?v=1">
+  <script defer src="https://cdn.jsdelivr.net/npm/moyasar-payment-form@2.3.0/dist/moyasar.umd.min.js"></script>
+  <script defer src="subscribe.js?v=2"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">انتقل للمحتوى</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/demo" aria-label="مؤكد — الصفحة الرئيسية"><span class="brand-mark" aria-hidden="true">م</span><span>مؤكّد</span></a>
+      <a class="back-link" href="/demo">العودة للموقع <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+    <div class="intro">
+      <div class="intro-copy">
+        <p class="eyebrow">اشتراك مؤكد للمكاتب القانونية</p>
+        <h1>خلّ رابط مكتبك<br><em>جاهز لكل استفسار.</em></h1>
+        <p class="lead">رابط حجز باسم مكتبك، وطلبات مرتبة في لوحة واحدة. اشترك الآن، وجدّد بنفسك كل شهر.</p>
+      </div>
+      <p class="intro-note">دفع الاشتراك لمؤكد فقط.<br>قيمة الاستشارات تروح لحساب مكتبك مباشرة.</p>
+    </div>
+
+    <div class="checkout-layout">
+      <section class="checkout" aria-labelledby="checkout-title">
+        <div class="section-heading"><span class="section-number">01</span><div><p>بيانات الاشتراك</p><h2 id="checkout-title">جهّز اشتراك مكتبك</h2></div></div>
+        <form id="subscribeForm" novalidate>
+          <div class="fields">
+            <label class="field wide" for="officeName">اسم المكتب <span>كما سيظهر في رابطك</span><input id="officeName" name="officeName" type="text" autocomplete="organization" maxlength="100" placeholder="مثال: مكتب حمد للمحاماة" required></label>
+            <label class="field" for="contactName">اسم المسؤول<input id="contactName" name="contactName" type="text" autocomplete="name" maxlength="100" placeholder="اسمك الكامل" required></label>
+            <label class="field" for="contactPhone">رقم الجوال<input id="contactPhone" name="contactPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05xxxxxxxx" pattern="(?:05[0-9]{8}|\+9665[0-9]{8})" required></label>
+            <label class="field wide" for="contactEmail">البريد الإلكتروني <span>للتواصل بخصوص الاشتراك</span><input id="contactEmail" name="contactEmail" type="email" autocomplete="email" placeholder="name@office.sa" required></label>
+          </div>
+
+          <div class="divider"></div>
+          <div class="section-heading payment-heading"><span class="section-number">02</span><div><p>طريقة الدفع</p><h2>ادفع أول شهر</h2></div></div>
+          <div class="payment-method"><div><strong>Apple Pay</strong><small>يظهر تأكيد الدفع على جهازك</small></div><span class="method-check" aria-hidden="true">✓</span></div>
+          <div class="due-mobile"><span>المبلغ المستحق اليوم</span><strong><span data-amount>99</span> <small>ر.س</small></strong></div>
+          <button class="apple-button" id="continueButton" type="submit">متابعة إلى الدفع</button>
+          <p class="payment-fine">تجديد الاشتراك يدوي. ما راح ينخصم منك مبلغ تلقائي الشهر القادم.</p>
+          <p class="form-message" id="formMessage" role="alert" aria-live="polite"></p>
+        </form>
+        <div id="paymentStep" hidden><p id="paymentIntro"></p><div id="moyasarForm" class="mysr-form"></div></div>
+        <div id="resultStep" class="result-step" hidden role="status" aria-live="polite"></div>
+      </section>
+
+      <aside class="summary" aria-labelledby="summary-title">
+        <div class="summary-top"><span>اشتراك مكتبك</span><span class="summary-mark" aria-hidden="true">م</span></div>
+        <h2 id="summary-title">مؤكّد لمكتبك</h2>
+        <p class="summary-description">من رسالة واتساب إلى طلب استشارة وموعد واضح.</p>
+        <div class="price"><strong data-amount>99</strong><span>ر.س<br><small>للشهر الأول</small></span></div>
+        <p class="price-note">سعر الإطلاق للاشتراك الشهري.</p>
+        <div class="summary-rule"></div>
+        <h3>يشمل اشتراكك</h3>
+        <ul class="features">
+          <li>رابط حجز باسم مكتبك</li>
+          <li>أسئلة فرز قصيرة قبل الحجز</li>
+          <li>لوحة للطلبات والمواعيد والمتابعة</li>
+          <li>دفع قيمة الاستشارة لحسابك مباشرة</li>
+        </ul>
+        <div class="total"><span>المبلغ المستحق اليوم</span><strong><span data-amount>99</span> ر.س</strong></div>
+        <p class="renewal">التجديد يدوي من صفحة الاشتراك. ما فيه خصم تلقائي.</p>
+      </aside>
+    </div>
+    <footer class="page-footer"><span>مؤكّد</span><p>الاشتراك في الأداة فقط؛ مؤكد لا يستلم أتعاب الاستشارات.</p><a href="/privacy">الخصوصية</a></footer>
+  </main>
+
+</body>
+</html>

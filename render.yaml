@@ -25,6 +25,12 @@ services:
         sync: false
       - key: HAMAD_PASSWORD_HASH
         sync: false
+      - key: MOYASAR_PUBLISHABLE_KEY
+        sync: false
+      - key: MOYASAR_SECRET_KEY
+        sync: false
+      - key: MOYASAR_APPLE_PAY_DOMAIN_READY
+        sync: false
 
   - type: cron
     name: muakkad-retention-cleanup
