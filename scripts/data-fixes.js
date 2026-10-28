@@ -5,6 +5,18 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    // Public identity from saiaseb2u.com; commercial settings await office approval.
+    id: '2026-10-28-maqbil-preview',
+    run: (c) => c.query(`INSERT INTO offices
+      (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only)
+      VALUES ('maqbil','مكتب المحامي والموثق عبدالرحمن مقيبل العتيبي للمحاماة والاستشارات القانونية',
+      '/platform/maqbil/name-mark.svg','966544376276',0,30,
+      '["يحددها المكتب"]',TRUE,
+      '{"commercial":"قضايا تجارية","criminal":"قضايا جنائية","realestate":"قضايا عقارية","notarization":"توثيق","other":"استشارة قانونية أخرى"}',
+      'السعر والمدة والأوقات وسياسة الإلغاء تُعتمد مع المكتب قبل التفعيل.',TRUE)
+      ON CONFLICT (slug) DO NOTHING`)
+  },
+  {
     // Name and phone supplied by the owner; commercial settings await approval.
     id: '2026-10-05-abdulmajeed-preview',
     run: (c) => c.query(`INSERT INTO offices

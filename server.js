@@ -491,6 +491,17 @@ app.get('/:slug', async (req, res, next) => {
       arbitration: [{ id: 'kind', label: 'الخدمة المطلوبة؟', options: ['تحكيم تجاري', 'وساطة', 'تسوية ودية'] }, { id: 'agreement', label: 'هل يوجد اتفاق تحكيم مكتوب؟', options: ['نعم', 'لا', 'غير متأكد'] }, deadline]
     };
   }
+  if (office.slug === 'maqbil' && office.preview_only) {
+    config.priceLabel = 'يحددها المكتب';
+    config.durationLabel = 'يحددها المكتب';
+    config.draftMessage = 'نسخة للمراجعة — السعر والمدة والأوقات تنتظر اعتماد المكتب. الحجز والدفع غير مفعّلين.';
+    const deadline = { id: 'deadline', label: 'هل توجد مهلة أو جلسة قريبة؟', options: ['لا', 'خلال أسبوع', 'خلال شهر', 'لا أعرف'] };
+    config.screening = {
+      criminal: [{ id: 'stage', label: 'مرحلة الموضوع؟', options: ['استفسار أولي', 'تحقيق', 'محاكمة', 'اعتراض', 'لا أعرف'] }, deadline],
+      notarization: [{ id: 'kind', label: 'نوع طلب التوثيق؟', options: ['وكالة', 'إقرار', 'عقد', 'أخرى'] }, { id: 'ready', label: 'هل متطلبات الطلب جاهزة؟', options: ['نعم', 'لا', 'أحتاج معرفة المتطلبات'] }, deadline],
+      other: [{ id: 'kind', label: 'الخدمة المطلوبة؟', options: ['استشارة عامة', 'مراجعة عقد', 'خدمة قانونية أخرى'] }, deadline]
+    };
+  }
   const officeName = escapeHtml(cleanText(office.name,140));
   html = html
     .replaceAll('مكتب حمد بن عواد الشريف للمحاماة والاستشارات القانونية', officeName)
@@ -501,6 +512,16 @@ app.get('/:slug', async (req, res, next) => {
     .replace('<script src="app.js?v=3"></script>', `<script>window.__OFFICE__=${JSON.stringify(config).replace(/</g,'\\u003c')};window.__OFFICE_SLUG__=${JSON.stringify(office.slug)};</script><script src="/hamad/app.js?v=8"></script>`)
     .replace('لا تُحفظ بياناتك على أي خادم في هذه الصفحة، ونستخدم إحصاءً مجهولًا لعدد الزيارات فقط بدون كوكيز. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.', 'تُحفظ بيانات الطلب بأقل قدر لازم لتأكيد الاستشارة ومتابعتها، ثم تُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع.')
     .replace('</form>', '<label class="sr-only">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>');
+  if (office.slug === 'maqbil') {
+    html = html.replaceAll('حمد بن عواد الشريف', 'عبدالرحمن مقيبل العتيبي').replaceAll('المدينة المنورة', 'الدوادمي')
+      .replaceAll('<span data-price></span> <small>ر.س</small>', '<span data-price></span>')
+      .replaceAll('<span data-duration></span> <small>دقيقة</small>', '<span data-duration></span>')
+      .replaceAll('<span data-price></span> ر.س', '<span data-price></span>')
+      .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
+      .replace('مثال: انتهى عقدي قبل شهرين ولم أستلم مكافأة نهاية الخدمة.', 'وصف مختصر للموضوع بدون هوية أو رقم قضية أو أسماء أطراف.')
+      .replace(/(<fieldset class="case-grid"[^>]*>)[\s\S]*?(<\/fieldset>)/, (_, start, end) => start + '<legend class="sr-only">نوع القضية أو الخدمة</legend>' + Object.entries(office.case_types).map(([key, label]) => `<label class="case-card"><input type="radio" name="caseType" value="${escapeHtml(key)}"><b>${escapeHtml(label)}</b></label>`).join('') + end)
+      .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');
+  }
   if (office.slug === 'alogla') {
     html = html.replaceAll('حمد بن عواد الشريف', 'علي العقلا').replaceAll('المدينة المنورة', 'الرياض')
       .replace('</head>', '<style>.brand-logo{width:110px;height:auto;max-width:30vw}.offer-logo{width:120px;height:auto;max-width:28vw;object-fit:contain}</style></head>');
