@@ -1,5 +1,8 @@
 'use strict';
 const office=window.__OFFICE__, $=id=>document.getElementById(id);
+$('basePrice').textContent=Number(office.price).toLocaleString('ar-SA');
+document.querySelectorAll('[data-duration]').forEach(x=>x.textContent=Number(office.duration).toLocaleString('ar-SA'));
+$('hoursHint').textContent=`${office.allDays?'كل أيام الأسبوع':'من الأحد إلى الخميس'} · ${office.times.join('، ')}. يثبت المكتب الساعة معك؛ هذا طلب موعد وليس تأكيدًا نهائيًا.`;
 const services={ 'أعمال التوثيق':['الوكالات','إفراغ أرض','إفراغ عقار آخر','توثيق عقود الأفراد والشركات','الإقرارات المالية','رهن العقارات وفك الرهن','سداد الإقرارات المالية','وكالة من مقر التوقيف بالدوادمي'], 'خدمات قانونية':['إعداد لائحة دعوى','حضور جلسة','مراجعة النيابة','مراجعة الشرطة','الاطلاع على ملف قضية بالنيابة','تمثيل جهة أو شركة'] };
 let kind='consultation', requestKey=crypto.randomUUID(), submitting=false;
 let started=false;
@@ -15,7 +18,7 @@ const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Riyadh'});
 for(let i=1;i<=30;i++){const d=new Date(today+'T12:00:00+03:00');d.setUTCDate(d.getUTCDate()+i);if(!office.allDays&&[5,6].includes(d.getUTCDay()))continue;$('day').add(new Option(d.toLocaleDateString('ar-SA',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Riyadh',calendar:'gregory'}),d.toISOString().slice(0,10)));}
 function setKind(value){kind=value;$('consultationFields').hidden=kind!=='consultation';$('serviceFields').hidden=kind!=='service';['caseType','day','period','mode'].forEach(x=>$(x).required=kind==='consultation');$('service').required=kind==='service';$('consultationTab').setAttribute('aria-pressed',String(kind==='consultation'));$('serviceTab').setAttribute('aria-pressed',String(kind==='service'));updatePrice();}
 function price(){return kind==='service'?($('service').value==='إفراغ أرض'?500:null):($('caseType').value==='labor'?150:office.price);}
-function updatePrice(){const amount=price();$('price').textContent=amount===null?'الأتعاب تُحدد مع المكتب بعد مراجعة الطلب. لا تحوّل مبلغًا قبل الاتفاق.':`${amount} ريال شامل الضريبة${kind==='consultation'?' · ٢٥ دقيقة':''}. التحويل لحساب المكتب مباشرة.`;if(!started&&($('caseType').value||$('service').value)){started=true;track('started');}}
+function updatePrice(){const amount=price();$('price').textContent=amount===null?'الأتعاب تُحدد مع المكتب بعد مراجعة الطلب. لا تحوّل مبلغًا قبل الاتفاق.':`${amount} ريال شامل الضريبة${kind==='consultation'?` · ${office.duration} دقيقة`:''}. التحويل لحساب المكتب مباشرة.`;if(!started&&($('caseType').value||$('service').value)){started=true;track('started');}}
 $('consultationTab').onclick=()=>setKind('consultation');$('serviceTab').onclick=()=>setKind('service');$('caseType').onchange=updatePrice;$('service').onchange=updatePrice;
 function applyAvailability(o){const paused=o.bookingsPaused||!o.active||o.planStatus==='paused'||o.draft;$('paused').hidden=!paused;if(!$('success').hidden)return;$('booking').hidden=paused;}
 async function refreshAvailability(){try{const r=await fetch('/api/public/maqbil/office',{cache:'no-store'});if(r.ok)applyAvailability(await r.json());}catch{}}
