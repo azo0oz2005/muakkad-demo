@@ -1,0 +1,14 @@
+<section class="maqbil-services" aria-labelledby="servicesTitle" style="max-width:1100px;margin:24px auto;padding:20px;border:1px solid #dce1ea;border-radius:16px;background:#fff">
+  <h2 id="servicesTitle">استشارة أو طلب خدمة</h2>
+  <p>الاستشارة ٢٥ دقيقة: ٢٠٠ ريال، والعمالية ١٥٠ ريال. الأسعار شاملة الضريبة.</p>
+  <p>الأحد إلى الخميس · فترة صباحية وفترة مسائية. الساعة تُحدد مع المكتب.</p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap"><button type="button" class="primary" id="consultationTab" aria-pressed="true">حجز استشارة</button><button type="button" class="secondary" id="serviceTab" aria-pressed="false">طلب خدمة قانونية</button></div>
+  <div id="servicePreview" hidden>
+    <h3>إيش الخدمة المطلوبة؟</h3>
+    <label class="field" for="serviceChoice"><span>نوع الخدمة</span><select id="serviceChoice"><option value="">اختر الخدمة</option><option>إفراغ أرض</option><option>إفراغ وتوثيق آخر</option><option>إعداد لائحة دعوى</option><option>حضور جلسة</option><option>مراجعة النيابة</option><option>مراجعة الشرطة</option><option>الاطلاع على ملف قضية بالنيابة</option><option>تمثيل جهة أو شركة</option></select></label>
+    <p id="servicePrice" role="status">تُحدد الأتعاب حسب الخدمة المطلوبة. إفراغ الأرض: ٥٠٠ ريال شامل الضريبة.</p>
+    <label class="field" for="serviceSummary"><span>وصف مختصر للطلب (اختياري)</span><textarea id="serviceSummary" maxlength="300" rows="3" placeholder="بدون هوية أو رقم قضية أو أسماء أطراف أو مستندات"></textarea></label>
+    <p>هذه نسخة للمراجعة. إرسال الطلب والدفع غير مفعّلين.</p>
+    <button type="button" class="primary" disabled>إرسال طلب الخدمة — غير مفعّل</button>
+  </div>
+</section>

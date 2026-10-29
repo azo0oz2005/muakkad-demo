@@ -492,12 +492,13 @@ app.get('/:slug', async (req, res, next) => {
     };
   }
   if (office.slug === 'maqbil' && office.preview_only) {
-    config.priceLabel = 'يحددها المكتب';
-    config.durationLabel = 'يحددها المكتب';
-    config.draftMessage = 'نسخة للمراجعة — السعر والمدة والأوقات تنتظر اعتماد المكتب. الحجز والدفع غير مفعّلين.';
+    config.draftMessage = 'نسخة للمراجعة — الحجز والدفع غير مفعّلين. اختر استشارة أو اطّلع على الخدمات.';
     const deadline = { id: 'deadline', label: 'هل توجد مهلة أو جلسة قريبة؟', options: ['لا', 'خلال أسبوع', 'خلال شهر', 'لا أعرف'] };
     config.screening = {
+      traffic: [{ id: 'kind', label: 'نوع الموضوع؟', options: ['حادث مروري', 'مطالبة شركة تأمين', 'تعويض عن حادث', 'أخرى'] }, deadline],
       criminal: [{ id: 'stage', label: 'مرحلة الموضوع؟', options: ['استفسار أولي', 'تحقيق', 'محاكمة', 'اعتراض', 'لا أعرف'] }, deadline],
+      realestate: [{ id: 'kind', label: 'نوع الموضوع؟', options: ['ملكية عقار', 'عيوب مبانٍ', 'إيجار', 'أخرى'] }, deadline],
+      inheritance: [{ id: 'kind', label: 'نوع الموضوع؟', options: ['قسمة تركة', 'حقوق ورثة', 'نزاع على تركة', 'أخرى'] }, deadline],
       notarization: [{ id: 'kind', label: 'نوع طلب التوثيق؟', options: ['وكالة', 'إقرار', 'عقد', 'أخرى'] }, { id: 'ready', label: 'هل متطلبات الطلب جاهزة؟', options: ['نعم', 'لا', 'أحتاج معرفة المتطلبات'] }, deadline],
       other: [{ id: 'kind', label: 'الخدمة المطلوبة؟', options: ['استشارة عامة', 'مراجعة عقد', 'خدمة قانونية أخرى'] }, deadline]
     };
@@ -513,11 +514,14 @@ app.get('/:slug', async (req, res, next) => {
     .replace('لا تُحفظ بياناتك على أي خادم في هذه الصفحة، ونستخدم إحصاءً مجهولًا لعدد الزيارات فقط بدون كوكيز. عند الضغط على «أرسل الطلب» يفتح واتساب برسالة إلى رقم المكتب، ولا تُرسل إلا إذا ضغطت إرسال بنفسك.', 'تُحفظ بيانات الطلب بأقل قدر لازم لتأكيد الاستشارة ومتابعتها، ثم تُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع.')
     .replace('</form>', '<label class="sr-only">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>');
   if (office.slug === 'maqbil') {
-    html = html.replaceAll('حمد بن عواد الشريف', 'عبدالرحمن مقيبل العتيبي').replaceAll('المدينة المنورة', 'الدوادمي')
-      .replaceAll('<span data-price></span> <small>ر.س</small>', '<span data-price></span>')
-      .replaceAll('<span data-duration></span> <small>دقيقة</small>', '<span data-duration></span>')
-      .replaceAll('<span data-price></span> ر.س', '<span data-price></span>')
-      .replace('الدفع مطلوب لتأكيد الموعد.', 'السعر وطريقة الدفع تُعتمد مع المكتب قبل التفعيل.')
+    html = html.replaceAll('حمد بن عواد الشريف', 'عبدالرحمن مقيبل المرشدي').replaceAll('المدينة المنورة', 'الدوادمي')
+      .replace('الدفع مطلوب لتأكيد الموعد.', 'الأسعار شاملة الضريبة. العمالية ١٥٠ ريال، وباقي الاستشارات ٢٠٠ ريال؛ المدة ٢٥ دقيقة.')
+      .replaceAll('الخصوصية وسياسة الإلغاء', 'الخصوصية')
+      .replaceAll('الخصوصية وشروط الإلغاء', 'الخصوصية')
+      .replace('<h3>الإلغاء</h3>', '')
+      .replace('<p id="cancelPolicy"></p>', '<p id="cancelPolicy" hidden></p>')
+      .replace('<h2 class="form-title" id="formTitle">', fs.readFileSync(path.join(root,'public','maqbil','services.html'),'utf8') + '<h2 class="form-title" id="formTitle">')
+      .replace('</body>', '<script src="/platform/maqbil/preview.js?v=1"></script></body>')
       .replace('مثال: انتهى عقدي قبل شهرين ولم أستلم مكافأة نهاية الخدمة.', 'وصف مختصر للموضوع بدون هوية أو رقم قضية أو أسماء أطراف.')
       .replace(/(<fieldset class="case-grid"[^>]*>)[\s\S]*?(<\/fieldset>)/, (_, start, end) => start + '<legend class="sr-only">نوع القضية أو الخدمة</legend>' + Object.entries(office.case_types).map(([key, label]) => `<label class="case-card"><input type="radio" name="caseType" value="${escapeHtml(key)}"><b>${escapeHtml(label)}</b></label>`).join('') + end)
       .replace('</head>', '<style>.brand-logo{width:64px;height:64px;object-fit:contain}.offer-logo{width:76px;height:76px;object-fit:contain}input,textarea,select{font-size:16px}</style></head>');

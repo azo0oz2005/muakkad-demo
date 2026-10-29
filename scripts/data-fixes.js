@@ -5,6 +5,14 @@ const { pool } = require('../src/db');
 
 const FIXES = [
   {
+    id: '2026-10-29-maqbil-approved-prices-specialties',
+    run: (c) => c.query(`UPDATE offices SET
+      name='مكتب المحامي عبدالرحمن مقيبل المرشدي للمحاماة والاستشارات القانونية',
+      price=200,duration_min=25,periods='["فترة صباحية","فترة مسائية"]',all_days=FALSE,
+      case_types='{"traffic":"حوادث مرورية ومطالبات التأمين","criminal":"دية وقصاص","realestate":"عقارات وعيوب مبانٍ","labor":"قضايا عمالية","inheritance":"تركات وحقوق الورثة","other":"استشارة أخرى"}',
+      cancel_policy='',updated_at=NOW() WHERE slug='maqbil' AND preview_only=TRUE`)
+  },
+  {
     // Public identity from saiaseb2u.com; commercial settings await office approval.
     id: '2026-10-28-maqbil-preview',
     run: (c) => c.query(`INSERT INTO offices
