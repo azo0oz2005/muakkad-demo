@@ -26,6 +26,26 @@ const FIXES = [
   },
   {
     // Name and phone supplied by the owner; commercial settings await approval.
+    id: '2026-10-29-maqbil-approved-logo-bank-activation',
+    run: (c) => c.query(`UPDATE offices SET logo_url='/platform/maqbil/logo.png',
+      bank_name='مصرف الإنماء',account_name='المحامي عبد الرحمن مقيبل العتيبي',
+      iban='SA4905000068206542954000',preview_only=FALSE,updated_at=NOW()
+      WHERE slug='maqbil'`)
+  },
+  {
+    id: '2026-10-29-maqbil-office-account',
+    run: async (c) => {
+      const crypto=require('crypto');
+      const bcrypt=require('bcryptjs');
+      const hash=await bcrypt.hash(crypto.randomBytes(48).toString('base64url'),12);
+      await c.query(`INSERT INTO users (office_id,email,password_hash,role,must_change_password,setup_expires_at)
+        SELECT id,'saiaseb2u@gmail.com',$1,'lawyer',TRUE,NOW()+INTERVAL '7 days' FROM offices
+        WHERE slug='maqbil' AND NOT EXISTS(SELECT 1 FROM users WHERE office_id=offices.id AND role='lawyer')
+        ON CONFLICT(email) DO NOTHING`,[hash]);
+    }
+  },
+  {
+    // Name and phone supplied by the owner; commercial settings await approval.
     id: '2026-10-05-abdulmajeed-preview',
     run: (c) => c.query(`INSERT INTO offices
       (slug,name,logo_url,whatsapp,price,duration_min,periods,all_days,case_types,cancel_policy,preview_only)

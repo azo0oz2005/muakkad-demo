@@ -44,6 +44,8 @@ app.use('/api/public/:slug', async (req, res, next) => {
   if (req.method === 'GET') return next();
   const office = await loadOffice(req.params.slug);
   if (office?.preview_only) return res.status(403).json({ error: 'نسخة للمراجعة فقط؛ الحجز لم يُفعّل بعد.' });
+  if (office?.slug==='maqbil' && !['/request','/event'].some(x=>req.path.endsWith(x))) return res.status(400).json({error:'حدّث الصفحة واستخدم نموذج المكتب الجديد.'});
+  if (office && (!office.active || office.plan_status === 'paused' || office.bookings_paused) && !req.path.endsWith('/event')) return res.status(409).json({error:'المكتب لا يستقبل حجوزات جديدة حاليًا. حاول لاحقًا.'});
   next();
 });
 app.use('/styles.css', express.static(path.join(root, 'styles.css')));
@@ -99,7 +101,7 @@ function safeOffice(row) {
     times: row.workspace_config?.enabled ? [`${row.workspace_config.start}–${row.workspace_config.end}`] : row.periods,
     allDays: row.workspace_config?.enabled ? row.workspace_config.days.length===7 : row.all_days, caseTypes: row.case_types,
     bankName: row.bank_name, accountName: row.account_name, iban: row.iban,
-    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only,
+    cancelPolicy: row.cancel_policy, active: row.active, planStatus: row.plan_status, draft: !!row.preview_only, bookingsPaused: !!row.bookings_paused,
     workspace: row.workspace_config
   };
 }
@@ -240,9 +242,27 @@ app.post('/api/change-password', requireAuth(), requireCsrf, async (req, res) =>
   const password = String(req.body.password || '');
   if (password.length < 10) return res.status(400).json({ error: 'كلمة المرور لازم تكون 10 أحرف على الأقل.' });
   const hash = await bcrypt.hash(password, 12);
-  await query('UPDATE users SET password_hash=$1,must_change_password=FALSE WHERE id=$2', [hash, req.session.user.id]);
+  const changed=await query(`UPDATE users SET password_hash=$1,must_change_password=FALSE,
+    setup_used_at=CASE WHEN setup_expires_at IS NOT NULL THEN NOW() ELSE setup_used_at END
+    WHERE id=$2 AND ($3=FALSE OR (setup_used_at IS NULL AND setup_expires_at>NOW())) RETURNING id`, [hash, req.session.user.id,!!req.session.user.setupActivation]);
+  if(!changed.rowCount)return res.status(403).json({error:'رابط التفعيل مستخدم أو منتهي. سجّل الدخول بكلمة المرور.'});
+  await query(`UPDATE session SET expire=NOW() WHERE (sess::jsonb->'user'->>'id')=$1 AND sid<>$2`,[String(req.session.user.id),req.sessionID]);
   req.session.user.mustChangePassword = false;
+  delete req.session.user.setupActivation;
   res.json({ ok: true });
+});
+
+app.get('/activate-office', async (req,res) => {
+  const {activationUserId,activationToken}=require('./src/office-activation');
+  const id=activationUserId(req.query.token,process.env.SESSION_SECRET);
+  const user=id?(await query("SELECT * FROM users WHERE id=$1 AND role='lawyer' AND setup_used_at IS NULL AND setup_expires_at>NOW()",[id])).rows[0]:null;
+  if(!user||activationToken(user,process.env.SESSION_SECRET)!==req.query.token)return res.status(403).type('html').send('<main dir="rtl" style="font-family:system-ui;padding:32px"><h1>رابط التفعيل مستخدم أو منتهي</h1><a href="/login">تسجيل الدخول</a></main>');
+  req.session.regenerate(error=>{
+    if(error)return res.sendStatus(500);
+    req.session.user={id:user.id,officeId:user.office_id,email:user.email,role:user.role,mustChangePassword:true,setupActivation:true};
+    req.session.csrfToken=crypto.randomBytes(24).toString('hex');
+    res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}).redirect('/dashboard');
+  });
 });
 
 app.get('/login', (_req, res) => res.sendFile(path.join(root, 'public', 'login.html')));
@@ -254,6 +274,7 @@ app.get('/dashboard', async (req,res) => {
 app.get('/admin', pageFor('owner_admin', 'admin.html'));
 app.use(['/api/dashboard', '/api/admin', '/api/workspace'], (req, res, next) => (req.session.user ? requirePasswordChanged(req, res, next) : next()));
 
+require('./src/maqbil')(app, {pool, loadOffice, safeOffice, submitLimiter});
 require('./src/workspace')(app,{ pool,query,loadOffice,safeOffice,requireAuth,requireCsrf,submitLimiter });
 app.use('/api/public/:slug',async(req,res,next)=>{
   if (req.method !== 'GET' && ['/start','/progress','/submit'].includes(req.path)) {
@@ -263,10 +284,17 @@ app.use('/api/public/:slug',async(req,res,next)=>{
   next();
 });
 
+app.patch('/api/dashboard/availability', requireAuth('lawyer'), requireCsrf, async (req,res) => {
+  if(typeof req.body.paused !== 'boolean') return res.status(400).json({error:'حالة غير صالحة.'});
+  const result=await query('UPDATE offices SET bookings_paused=$1,updated_at=NOW() WHERE id=$2 RETURNING bookings_paused',[req.body.paused,req.session.user.officeId]);
+  if(!result.rowCount)return res.status(404).json({error:'المكتب غير موجود.'});
+  res.json({paused:result.rows[0].bookings_paused});
+});
+
 app.get('/api/public/:slug/office', async (req, res) => {
   const office = await loadOffice(req.params.slug);
   if (!office) return res.status(404).json({ error: 'المكتب غير موجود.' });
-  res.json(safeOffice(office));
+  res.set('Cache-Control','no-store').json(safeOffice(office));
 });
 
 app.post('/api/public/:slug/event', async (req, res) => {
@@ -353,23 +381,24 @@ app.get('/api/dashboard/summary', requireAuth(), async (req, res) => {
     query('SELECT * FROM offices WHERE id=$1', [officeId]),
     query(`SELECT COUNT(*) FILTER (WHERE type='visit')::int visits, COUNT(*) FILTER (WHERE type='started')::int started FROM events WHERE office_id=$1 ${eventsWhere}`, [officeId]),
     query(`SELECT COUNT(*) FILTER (WHERE status IN ('submitted','awaiting_payment','paid','confirmed','cancelled','no_show'))::int submitted,
-      COUNT(*) FILTER (WHERE status IN ('paid','confirmed'))::int paid,
-      COUNT(*) FILTER (WHERE status='started')::int incomplete
+      COUNT(*) FILTER (WHERE status IN ('paid','confirmed') AND paid_at IS NOT NULL)::int paid,
+      COUNT(*) FILTER (WHERE status='started')::int incomplete,
+      COALESCE(SUM(COALESCE(quoted_price,(SELECT price FROM offices WHERE id=$1))) FILTER (WHERE status IN ('paid','confirmed') AND paid_at IS NOT NULL),0)::int revenue
       FROM bookings WHERE office_id=$1 ${bookingsWhere}`, [officeId]),
     query(`SELECT step,COUNT(DISTINCT session_hash)::int count FROM events WHERE office_id=$1 AND type='step_reached' ${eventsWhere} GROUP BY step ORDER BY step`, [officeId])
   ]);
   const e = eventStats.rows[0]; const b = bookingStats.rows[0]; const price = office.rows[0].price;
   res.json({ office: safeOffice(office.rows[0]), visits:e.visits, started:e.started, submitted:b.submitted, paid:b.paid,
     incomplete:b.incomplete, visitConversion:e.visits ? Math.round(b.paid/e.visits*100) : 0,
-    startConversion:e.started ? Math.round(b.paid/e.started*100) : 0, revenue:b.paid*price, funnel:funnel.rows });
+    startConversion:e.started ? Math.round(b.paid/e.started*100) : 0, revenue:b.revenue, funnel:funnel.rows });
 });
 
 app.get('/api/dashboard/bookings', requireAuth(), async (req, res) => {
   const officeId = officeScope(req);
   if (!officeId) return res.status(403).json({ error: 'غير مصرح.' });
   const tab = req.query.tab;
-  const statusSql = tab === 'incomplete' ? "status='started'" : tab === 'paid' ? "status IN ('paid','confirmed')" : "status='awaiting_payment'";
-  const result = await query(`SELECT id,ref,case_type,client_name,client_phone,preferred_day,preferred_period,status,followup_status,last_step,created_at,updated_at,paid_at
+  const statusSql = tab === 'all' ? 'TRUE' : tab === 'incomplete' ? "status='started'" : tab === 'paid' ? "status IN ('paid','confirmed')" : "status='awaiting_payment'";
+  const result = await query(`SELECT id,ref,case_type,request_kind,service_label,quoted_price,answers,summary,client_name,client_phone,preferred_day,preferred_period,status,followup_status,last_step,created_at,updated_at,paid_at
     FROM bookings WHERE office_id=$1 AND ${statusSql} ORDER BY updated_at DESC LIMIT 200`, [officeId]);
   res.json(result.rows);
 });
@@ -378,10 +407,20 @@ app.patch('/api/dashboard/bookings/:id', requireAuth(), requireCsrf, async (req,
   const officeId = officeScope(req);
   if((await query('SELECT workspace_config FROM offices WHERE id=$1',[officeId])).rows[0]?.workspace_config?.enabled) return res.status(400).json({error:'استخدم لوحة المواعيد والخدمات.'});
   const status = ['paid','confirmed','cancelled','no_show'].includes(req.body.status) ? req.body.status : null;
+  if (req.body.quotedPrice !== undefined) {
+    const price=Number(req.body.quotedPrice);
+    if(!officeId || !Number.isInteger(price)||price<0||price>100000)return res.status(400).json({error:'راجع الأتعاب.'});
+    const updated=await query("UPDATE bookings SET quoted_price=$1,updated_at=NOW() WHERE id=$2 AND office_id=$3 AND request_kind='service' AND status='awaiting_payment' RETURNING id",[price,req.params.id,officeId]);
+    return updated.rowCount?res.json({ok:true}):res.status(404).json({error:'طلب الخدمة غير موجود أو مغلق.'});
+  }
   const followup = ['none','followed','not_interested'].includes(req.body.followupStatus) ? req.body.followupStatus : null;
   if (!officeId || (!status && !followup)) return res.status(400).json({ error: 'حالة غير صالحة.' });
+  if(status==='paid'||status==='confirmed') {
+    const b=(await query('SELECT request_kind,quoted_price FROM bookings WHERE id=$1 AND office_id=$2',[req.params.id,officeId])).rows[0];
+    if(b?.request_kind==='service' && b.quoted_price===null)return res.status(400).json({error:'حدد أتعاب الخدمة قبل تأكيد الدفع أو الطلب.'});
+  }
   const result = await query(`UPDATE bookings SET
-    status=COALESCE($1,status), followup_status=COALESCE($2,followup_status),
+    status=CASE WHEN $1='paid' AND status='confirmed' THEN 'confirmed' ELSE COALESCE($1,status) END, followup_status=COALESCE($2,followup_status),
     paid_at=CASE WHEN $1='paid' THEN COALESCE(paid_at,NOW()) ELSE paid_at END, updated_at=NOW()
     WHERE id=$3 AND office_id=$4 RETURNING id,status,followup_status`, [status, followup, req.params.id, officeId]);
   if (!result.rows[0]) return res.status(404).json({ error: 'الطلب غير موجود.' });
@@ -464,6 +503,10 @@ app.get('/:slug', async (req, res, next) => {
   const office = await loadOffice(req.params.slug);
   if (!office) return res.status(404).send('المكتب غير موجود');
   if (!office.active || office.plan_status === 'paused') return res.status(503).send('<main dir="rtl" style="font-family:system-ui;max-width:600px;margin:15vh auto;padding:24px"><h1>الحجز متوقف مؤقتًا</h1><p>تواصل مع المكتب مباشرة، ونعتذر عن الإزعاج.</p></main>');
+  if(office.slug==='maqbil') {
+    const html=fs.readFileSync(path.join(root,'public','maqbil','client.html'),'utf8').replace('__OFFICE_CONFIG__',JSON.stringify(safeOffice(office)).replace(/</g,'\\u003c'));
+    return res.set('Cache-Control','no-store').type('html').send(html);
+  }
   if(office.workspace_config?.enabled) {
     const config=safeOffice(office);
     const html=fs.readFileSync(path.join(root,'public','workspace-client.html'),'utf8')

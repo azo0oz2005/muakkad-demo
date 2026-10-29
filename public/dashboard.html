@@ -16,9 +16,10 @@
   <div class="filters" id="ranges"><button data-range="today">اليوم</button><button class="active" data-range="7d">7 أيام</button><button data-range="30d">30 يوم</button><button data-range="all">الكل</button></div>
   <section class="stats" id="stats"></section>
   <div class="grid"><section>
-    <div class="tabs" id="tabs"><button class="active" data-tab="awaiting">بانتظار الدفع</button><button data-tab="paid">مدفوعة / مؤكدة</button><button data-tab="incomplete">غير مكتملة</button><button data-tab="settings">الإعدادات</button></div>
+    <section class="panel" style="margin-bottom:16px"><div class="actions"><button id="flightMode" type="button" class="secondary" aria-pressed="false"><span aria-hidden="true">✈</span> وضع الطيران</button><span id="availability" role="status">جارٍ تحميل حالة الحجوزات…</span></div><p class="muted">وضع الطيران يوقف الطلبات الجديدة مؤقتًا. تبقى حجوزاتك السابقة متاحة للمتابعة.</p></section>
+    <div class="tabs" id="tabs"><button class="active" data-tab="awaiting">طلبات جديدة / بانتظار الدفع</button><button data-tab="paid">مدفوعة / مؤكدة</button><button data-tab="all">كل الطلبات</button><button data-tab="incomplete">غير مكتملة</button><button data-tab="settings">الإعدادات</button></div>
     <div class="list" id="bookings"></div>
     <form id="settings" class="panel settings hidden"><label class="field">السعر<input id="price" type="number" min="0"></label><label class="field">المدة بالدقائق<input id="duration" type="number" min="10"></label><label class="field">واتساب<input id="whatsapp" dir="ltr"></label><label class="field">الفترات، افصل بفاصلة<input id="times"></label><label class="field">البنك<input id="bankName"></label><label class="field">المستفيد<input id="accountName"></label><label class="field wide">الآيبان<input id="iban" dir="ltr"></label><label class="field wide">سياسة الإلغاء<textarea id="cancelPolicy"></textarea></label><label><input id="allDays" type="checkbox"> عرض كل أيام الأسبوع</label><button class="primary">حفظ الإعدادات</button><p id="settingsMsg"></p></form>
   </section><aside class="panel"><h2>رابط المكتب</h2><p class="office-link"><a id="officeLink" target="_blank" rel="noopener">جارٍ التحميل…</a></p><button class="primary" id="copyLink2" type="button">نسخ الرابط</button><img id="qr" width="180" height="180" alt="رمز QR لرابط المكتب" hidden></aside></div>
   </div>
-</main><script src="/platform/dashboard.js?v=3"></script></body></html>
+</main><script src="/platform/dashboard.js?v=4"></script><script src="/platform/maqbil/dashboard.js?v=1"></script></body></html>

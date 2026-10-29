@@ -22,8 +22,7 @@ async function loadLink(){try{const link=await request('/api/dashboard/link');se
   if(!user||user.role!=='lawyer'){location.href='/login';return}
   if(user.mustChangePassword){$('app').classList.add('hidden');$('passwordBox').classList.remove('hidden');$('newPassword').focus();return}
   $('passwordBox').classList.add('hidden');
-  const results=await Promise.allSettled([loadSummary(),loadBookings()]);
+  await loadSummary();
+  await loadBookings();
   await loadLink();
-  const failed=results.find(r=>r.status==='rejected');
-  if(failed)showError('تعذر تحميل جزء من البيانات: '+failed.reason.message);
 })().catch(e=>showError('تعذر تحميل اللوحة: '+e.message));
