@@ -40,7 +40,8 @@ module.exports = function mountMaqbil(app, {pool, loadOffice, safeOffice, submit
         await c.query('ROLLBACK');return res.status(400).json({error:'اختر خدمة من القائمة.'});
       }
       const price=requestPrice(kind,caseType,service,office);
-      const answers=kind==='consultation'? {'طريقة الاستشارة':mode}:{};
+      const rawAnswers=req.body.answers&&typeof req.body.answers==='object'&&!Array.isArray(req.body.answers)?req.body.answers:{};
+      const answers=kind==='consultation'? {...Object.fromEntries(Object.entries(rawAnswers).slice(0,10).map(([key,value])=>[cleanText(key,80),cleanText(value,120)])),'طريقة الاستشارة':mode}:{};
       const result=await c.query(`INSERT INTO bookings
         (office_id,ref,request_kind,case_type,service_label,quoted_price,answers,summary,client_name,client_phone,preferred_day,preferred_period,status,last_step,session_hash)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'awaiting_payment',5,$13) RETURNING id,ref`,

@@ -1,11 +1,177 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>حجز استشارة | عبدالرحمن مقيبل المرشدي</title><meta name="description" content="احجز استشارة أو اطلب خدمة من مكتب المحامي عبدالرحمن مقيبل المرشدي في الدوادمي"><link rel="stylesheet" href="/platform/maqbil/client.css?v=1"></head>
-<body><header class="mast"><a href="/maqbil" aria-label="مكتب المحامي عبدالرحمن مقيبل"><img src="/platform/maqbil/logo.png" alt="شعار مكتب المحامي عبدالرحمن مقيبل العتيبي"></a><a class="login" href="/login">دخول المكتب</a></header>
-<main><section class="intro"><div><p class="eyebrow">الدوادمي · محاماة وتوثيق</p><h1>مكتب المحامي<br>عبدالرحمن مقيبل المرشدي</h1><p>للمحاماة والاستشارات القانونية</p><p class="lead">استشارتك بموعد واضح،<br>وطلب خدمتك في مكان واحد.</p><p>اختر الاستشارة أو الخدمة، وأرسل طلبك. يراجع المكتب الطلب ويتواصل معك لتأكيد التفاصيل والموعد.</p></div><aside class="fees"><span>الاستشارة القانونية</span><p><b id="basePrice">٢٠٠</b> ريال <small>/ <span data-duration>٢٥</span> دقيقة</small></p><hr><span>الاستشارة العمالية</span><p><b>١٥٠</b> ريال <small>/ <span data-duration>٢٥</span> دقيقة</small></p><small>الأسعار شاملة الضريبة. التحويل لحساب المكتب مباشرة.</small><p class="credit">عند استلام المكتب للقضية، تُحتسب قيمة الاستشارة ضمن أتعابها.</p></aside></section>
-<section id="paused" class="notice" hidden role="status"><b>✈ وضع الطيران: الحجوزات متوقفة مؤقتًا</b><p>المكتب لا يستقبل حجوزات أو طلبات خدمات جديدة حاليًا. نرجو المحاولة لاحقًا.</p></section>
-<section id="booking" class="booking" aria-labelledby="bookingTitle"><div class="section-title"><p class="eyebrow">ابدأ طلبك</p><h2 id="bookingTitle">استشارة أو خدمة قانونية</h2></div><div class="tabs" role="group" aria-label="نوع الطلب"><button type="button" id="consultationTab" aria-pressed="true">حجز استشارة</button><button type="button" id="serviceTab" aria-pressed="false">طلب خدمة</button></div>
-<form id="requestForm"><div id="consultationFields"><label class="field">اختر نوع القضية<select id="caseType" required><option value="">اختر نوع القضية</option></select></label><div class="form-grid"><label class="field">طريقة الاستشارة<select id="mode" required><option value="">اختر الطريقة</option><option>حضورية</option><option>اتصال هاتفي</option></select></label><label class="field">اليوم المفضل<select id="day" required><option value="">اختر اليوم</option></select></label><label class="field">الفترة المفضلة<select id="period" required><option value="">اختر الفترة</option></select></label></div><p class="hint" id="hoursHint">من الأحد إلى الخميس، صباحًا ومساءً. يثبت المكتب الساعة معك؛ هذا طلب موعد وليس تأكيدًا نهائيًا.</p></div>
-<div id="serviceFields" hidden><label class="field">اختر نوع الخدمة<select id="service"><option value="">اختر الخدمة</option></select></label><p class="hint">أعمال التوثيق تشمل الوكالات، والإفراغ، وتوثيق العقود، والإقرارات المالية وسدادها، ورهن العقارات وفك الرهن.</p><p class="hint">للوكالة من مقر التوقيف: خدمة للموقوف لدى مكافحة المخدرات أو الشرطة بمحافظة الدوادمي. تُنسق المتطلبات مع المكتب مباشرة.</p></div>
-<p id="price" class="price" role="status"></p><div class="form-grid"><label class="field">الاسم<input id="clientName" autocomplete="name" maxlength="60" minlength="2" required></label><label class="field">رقم الجوال<input id="clientPhone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="05xxxxxxxx" required></label></div><label class="field">وصف مختصر (اختياري)<textarea id="summary" rows="3" maxlength="300" placeholder="بدون هوية أو رقم قضية أو أسماء أطراف أو مستندات"></textarea></label><label class="trap" aria-hidden="true">اتركه فارغًا<input id="website" tabindex="-1" autocomplete="off"></label><label class="consent"><input id="consent" type="checkbox" required> أوافق على حفظ بيانات الطلب والتواصل معي بخصوصه. <a href="/privacy" target="_blank" rel="noopener">الخصوصية</a></label><p class="hint">لا نطلب هوية، أو رقم قضية، أو أسماء خصوم، أو مستندات. تُناقش التفاصيل مع المحامي مباشرة. تُخفى بيانات التواصل تلقائيًا بعد ٩٠ يومًا.</p><p id="error" class="error" role="alert"></p><button id="submit" class="primary">إرسال الطلب للمكتب</button></form></section>
-<section id="success" class="booking" hidden aria-live="polite"><p class="eyebrow">وصل طلبك</p><h2 tabindex="-1" id="successTitle">تم حفظ الطلب</h2><p>رقم الطلب: <b id="ref" dir="ltr"></b></p><p>الموعد لا يتأكد تلقائيًا. يراجع المكتب الطلب ويتواصل معك.</p><div id="bank" class="bank"></div><a id="whatsapp" class="primary" target="_blank" rel="noopener">متابعة الطلب عبر واتساب</a><p class="hint">يفتح الرابط رسالة جاهزة؛ أنت تختار إرسالها. أرسل إيصال التحويل للمكتب مباشرة عند الحاجة.</p><button id="newRequest" type="button" class="secondary">طلب جديد</button></section>
-</main><footer>مكتب المحامي عبدالرحمن مقيبل المرشدي · الدوادمي <span>تنظيم الحجوزات بواسطة <a href="/demo">مؤكّد</a></span></footer><script>window.__OFFICE__=__OFFICE_CONFIG__;</script><script src="/platform/maqbil/client.js?v=2"></script></body></html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="احجز استشارة قانونية مع مكتب المحامي عبدالرحمن مقيبل المرشدي للمحاماة والاستشارات القانونية">
+  <title>حجز استشارة | عبدالرحمن مقيبل المرشدي للمحاماة</title>
+  <link rel="icon" href="/platform/maqbil/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=6">
+  <link rel="stylesheet" href="/platform/maqbil/client.css?v=3">
+</head>
+<body>
+  <p class="draft-ribbon" id="draftRibbon" hidden></p>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="مكتب المحامي عبدالرحمن مقيبل المرشدي للمحاماة والاستشارات القانونية">
+      <img class="brand-logo" src="/platform/maqbil/logo.png" alt="شعار المكتب" width="64" height="40">
+      <span><strong class="brand-name">عبدالرحمن مقيبل المرشدي</strong><small>للمحاماة والاستشارات القانونية</small></span>
+    </a>
+  <a class="office-link" href="/login">دخول المكتب</a></header>
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <main id="clientView">
+    <section class="offer" aria-labelledby="offerTitle">
+      <div class="offer-who">
+        <img class="offer-logo" src="/platform/maqbil/logo.png" alt="شعار المكتب" width="72" height="72">
+        <div>
+          <p class="eyebrow">حجز استشارة قانونية</p>
+          <h1 id="offerTitle">عبدالرحمن مقيبل المرشدي</h1>
+          <p class="license">للمحاماة والاستشارات القانونية · الدوادمي</p>
+          <ul class="offer-points">
+            <li>استشارة حضورية أو هاتفية</li>
+            <li>بدون إنشاء حساب</li>
+          </ul><p class="hint credit-note">عند استلام المكتب للقضية، تُحتسب قيمة الاستشارة ضمن أتعابها.</p>
+        </div>
+      </div>
+      <div class="offer-box">
+        <dl class="offer-facts">
+          <div><dt>القيمة</dt><dd><span data-price></span> <small data-currency>ر.س</small></dd></div>
+          <div><dt>المدة</dt><dd><span data-duration></span> <small data-duration-unit>دقيقة</small></dd></div>
+        </dl>
+        <p class="pay-note"><b>الأسعار شاملة الضريبة.</b> العمالية ١٥٠ ريال، وباقي الاستشارات <span data-base-price></span> ريال؛ المدة <span data-base-duration></span> دقيقة. الموعد ينتظر تأكيد المكتب.</p>
+        <button type="button" class="primary" id="startBtn">ابدأ حجز الاستشارة</button>
+      </div>
+    </section>
+
+    <section class="notice" id="paused" role="status" hidden><b>✈ الحجوزات متوقفة مؤقتًا</b><p>المكتب لا يستقبل حجوزات أو طلبات خدمات جديدة حاليًا. نرجو المحاولة لاحقًا.</p></section><h2 class="form-title" id="formTitle">احجز استشارتك خلال دقيقتين</h2>
+    <section class="workspace" id="workspace" aria-labelledby="formTitle">
+      <div class="form-panel">
+        <div class="progress-wrap">
+          <div class="progress-copy"><span id="stepLabel">الخطوة 1 من 5</span><span id="stepName">نوع القضية</span></div>
+          <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+
+        <form id="intakeForm" novalidate>
+          <!-- 1 -->
+          <section class="step active" data-step="1" aria-labelledby="h1s">
+            <div class="request-tabs" role="group" aria-label="نوع الطلب"><button type="button" class="secondary" id="consultationTab" aria-pressed="true">حجز استشارة</button><button type="button" class="secondary" id="serviceTab" aria-pressed="false">طلب خدمة</button></div>
+            <h2 id="h1s" tabindex="-1">اختر نوع القضية</h2>
+            <p class="hint" id="typeHint">اختر الأقرب لموضوعك.</p>
+            <fieldset class="case-grid" id="caseTypes" aria-describedby="typeError"><legend class="sr-only">اختر نوع القضية</legend></fieldset>
+            <div id="serviceFields" hidden><label class="field" for="serviceChoice"><span>نوع الخدمة</span><select id="serviceChoice"><option value="">اختر الخدمة</option></select></label><p class="hint">الوكالة من مقر التوقيف للموقوف لدى مكافحة المخدرات أو الشرطة بمحافظة الدوادمي. تُنسق المتطلبات مع المكتب مباشرة.</p></div>
+            <p class="error" id="typeError" role="alert"></p>
+          </section>
+
+          <!-- 2 -->
+          <section class="step" data-step="2" aria-labelledby="h2s">
+            <h2 id="h2s" tabindex="-1">أسئلة فرز سريعة</h2>
+            <p class="hint" id="screeningHint">اختيارات قصيرة تساعد المحامي يجهز للاستشارة.</p>
+            <div id="screening"></div>
+            <label class="field" for="caseDetails"><span>ملخص مختصر <em>(اختياري)</em></span>
+              <textarea id="caseDetails" rows="3" maxlength="300" aria-describedby="sensitiveNote charHint" placeholder="بدون هوية أو رقم قضية أو أسماء أطراف أو مستندات"></textarea>
+              <small id="charHint"><b id="charCount">0</b> / 300</small>
+            </label>
+            <p class="notice" id="sensitiveNote">لا تكتب بيانات شخصية حساسة أو ترسل مستندات. التفاصيل الكاملة تُناقش مع المحامي أثناء الاستشارة.</p>
+          </section>
+
+          <!-- 3 -->
+          <section class="step" data-step="3" aria-labelledby="h3s">
+            <h2 id="h3s" tabindex="-1">متى يناسبك؟</h2>
+            <div id="appointmentFields"><p class="hint">اختر اليوم والفترة المفضلة. يثبت المكتب الساعة ويؤكد الموعد معك؛ الطلب لا يُؤكد تلقائيًا.</p>
+            <fieldset class="times" id="consultationMode" aria-describedby="modeError"><legend>طريقة الاستشارة</legend><label><input type="radio" name="mode" value="حضورية"><span>حضورية</span></label><label><input type="radio" name="mode" value="اتصال هاتفي"><span>اتصال هاتفي</span></label></fieldset><p class="error" id="modeError" role="alert"></p>
+            <div class="days" id="days" role="group" aria-label="اليوم" aria-describedby="dayError"></div>
+            <p class="error" id="dayError" role="alert"></p>
+            <fieldset class="times" id="times" aria-describedby="timeError">
+              <legend class="sr-only">الوقت</legend>
+            </fieldset>
+            <p class="error" id="timeError" role="alert"></p></div><p class="notice" id="serviceTimingNote" hidden>يراجع المكتب طلب الخدمة ويتواصل معك لتحديد المتطلبات والأتعاب والتوقيت المناسب.</p>
+          </section>
+
+          <!-- 4 -->
+          <section class="step" data-step="4" aria-labelledby="h4s">
+            <h2 id="h4s" tabindex="-1">بيانات التواصل</h2>
+            <p class="hint">يستخدمها المكتب لتأكيد الموعد فقط.</p>
+            <label class="field" for="name"><span>الاسم</span>
+              <input id="name" type="text" autocomplete="name" maxlength="40" aria-describedby="nameError">
+            </label>
+            <p class="error" id="nameError" role="alert"></p>
+            <label class="field" for="phone"><span>رقم الجوال</span>
+              <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="05xxxxxxxx" aria-describedby="phoneError">
+            </label>
+            <p class="error" id="phoneError" role="alert"></p>
+            <label class="consent"><input id="consent" type="checkbox" aria-describedby="consentError"><span>أوافق على <button type="button" class="linklike" data-open="privacyDialog">سياسة الخصوصية</button>.</span></label>
+            <p class="error" id="consentError" role="alert"></p>
+          </section>
+
+          <!-- 5 -->
+          <section class="step" data-step="5" aria-labelledby="h5s">
+            <h2 id="h5s" tabindex="-1">راجع طلبك وأرسله للمكتب</h2>
+            <dl class="invoice">
+              <div><dt>نوع الطلب</dt><dd id="revType"></dd></div>
+              <div><dt>الموعد المطلوب</dt><dd id="revSlot"></dd></div>
+              <div><dt>الاسم</dt><dd id="revName"></dd></div>
+              <div class="total"><dt>قيمة الطلب</dt><dd><span data-price></span> <span data-currency>ر.س</span></dd></div>
+            </dl>
+            <div class="pay-info" id="payInfo"></div>
+            <button type="button" class="pay wa-send" id="sendBtn">إرسال الطلب للمكتب</button>
+            <p class="hint small-note">يُحفظ طلبك في لوحة المكتب بانتظار المراجعة والتأكيد. التحويل لحساب المكتب مباشرة.</p>
+          </section>
+
+          <!-- 6 -->
+          <section class="step success" data-step="6" aria-labelledby="h6s">
+            <div class="success-mark" aria-hidden="true">✓</div>
+            <h2 id="h6s" tabindex="-1">تم حفظ طلبك</h2><p>رقم الطلب: <b id="bookingRef" dir="ltr"></b></p>
+            <p class="hint">الطلب بانتظار مراجعة المكتب وتأكيده. تقدر تتابعه عبر واتساب.</p>
+            <a class="primary" id="resendLink" href="#" target="_blank" rel="noopener">متابعة الطلب عبر واتساب</a>
+            <p class="hint" style="margin-top:14px"><span id="successPaymentNote">بيانات حساب المكتب موجودة في مراجعة الطلب. لا يتأكد الموعد تلقائيًا بعد إرسال الطلب.</span></p>
+            <div class="success-actions">
+              <button type="button" class="restart" id="restart">طلب جديد</button>
+            </div>
+          </section>
+
+          <div class="mini-summary" id="miniSummary" hidden></div>
+
+          <div class="actions" id="actions">
+            <button type="button" class="back" id="backBtn">رجوع</button>
+            <button type="button" class="next" id="nextBtn">التالي</button>
+          </div>
+        <label class="sr-only" aria-hidden="true">اترك هذا الحقل فارغًا<input id="website" name="website" tabindex="-1" autocomplete="off"></label></form>
+      </div>
+
+      <aside class="case-file" aria-label="ملخص الطلب">
+        <div class="file-tab">ملخص الطلب</div>
+        <dl>
+          <div><dt>النوع</dt><dd id="sumType">لم يُحدد</dd></div>
+          <div><dt>الموعد</dt><dd id="sumSlot">لم يُحدد</dd></div>
+          <div><dt>القيمة</dt><dd><span data-price></span> <span data-currency>ر.س</span></dd></div>
+        </dl>
+        <p class="file-note">يصل للمكتب: الاسم، رقم الجوال، نوع القضية، إجابات الفرز، والموعد المطلوب. لا نطلب هوية أو مستندات.</p>
+        <button type="button" class="linklike" data-open="privacyDialog">الخصوصية</button>
+      </aside>
+    </section>
+  </main>
+
+  <footer><strong>عبدالرحمن مقيبل المرشدي للمحاماة والاستشارات القانونية</strong><span class="by">بواسطة مؤكّد</span><button type="button" class="linklike" data-open="privacyDialog">الخصوصية</button></footer>
+
+  <dialog id="privacyDialog" aria-labelledby="privTitle">
+    <h2 id="privTitle">الخصوصية</h2>
+    <h3>البيانات التي نجمعها</h3>
+    <p>الاسم، رقم الجوال، نوع القضية، إجابات أسئلة الفرز، وملخص اختياري قصير.</p>
+    <h3>سبب جمعها</h3>
+    <p>تأكيد الموعد وتجهيز المحامي للاستشارة، والتواصل بخصوص هذا الطلب فقط.</p>
+    <h3>كيف تُرسل</h3>
+    <p>تُحفظ بيانات الطلب لتأكيد الموعد ومتابعته، وتُخفى البيانات الشخصية تلقائيًا بعد 90 يومًا. لا نخزن عنوان IP ولا نستخدم كوكيز تتبع. رابط واتساب يجهّز رسالة؛ إرسالها باختيارك.</p>
+    <h3>ما لا نطلبه</h3>
+    <p>لا نطلب رقم الهوية أو رقم القضية أو أسماء الخصوم أو أي مستندات.</p>
+
+    <button type="button" class="primary" data-close>إغلاق</button>
+  </dialog>
+
+  <script>window.__OFFICE__=__OFFICE_CONFIG__;</script><script src="/platform/maqbil/client.js?v=3"></script>
+</body>
+</html>
