@@ -176,6 +176,15 @@ const FIXES = [
       await c.query('DELETE FROM events WHERE office_id=$1', [officeId]);
       console.log(`hamad delivery test: backed up and cleared ${b.rowCount} bookings, ${e.rowCount} events`);
     }
+  },
+  {
+    // Owner explicitly requested a clean Maqbil dashboard after his tests.
+    id: '2026-10-30-maqbil-reset-owner-test-activity',
+    run: async (c) => {
+      const reset = require('../src/reset-office-test-data');
+      const counts = await reset(c, 'maqbil', '2026-10-30-maqbil-reset-owner-test-activity');
+      console.log(`maqbil test reset: backed up and cleared ${counts.bookings} bookings, ${counts.events} events, ${counts.calendar_blocks} calendar blocks`);
+    }
   }
 ];
 
