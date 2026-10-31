@@ -29,7 +29,7 @@
     $('cost').textContent = money(cost);
     $('profit').textContent = `${money(profit)} · ${number(profit / quote * 100)}٪`;
     $('total').textContent = money(latest.total);
-    $('price-note').textContent = profit < 0 ? 'عرضك أقل من التكلفة المقدرة. راجع النطاق والسعر قبل الاعتماد.' : quote < suggested ? 'عرضك أقل من الهامش المستهدف. تقدر تعدّل السعر أو نطاق العمل.' : 'عرضك يحقق الهامش المستهدف وفق تقديراتك. القرار النهائي لك.';
+    $('price-note').textContent = profit < 0 ? 'عرضك أقل من التكلفة المقدرة. راجع النطاق والسعر قبل الاعتماد.' : quote < suggested ? 'عرضك أقل من الهامش المستهدف. يمكنك تعديل الأتعاب أو نطاق العمل.' : 'عرضك يحقق الهامش المستهدف وفق تقديراتك. القرار النهائي لك.';
     updateOffer();
   }
   function updateOffer() {
@@ -121,14 +121,14 @@
     const remaining = 2;
     const excess = Math.max(0, Number($('extra-hours').value) - remaining);
     const cost = excess * Number($('extra-rate').value);
-    $('extra-result').textContent = excess ? `المتبقي ساعتان. الإضافة خارج الرصيد: ${number(excess)} ساعات بقيمة ${money(cost)} قبل الضريبة، بعد موافقة العميل.` : 'الطلب داخل الرصيد المتبقي في المثال. لا توجد إضافة مالية.';
+    $('extra-result').textContent = excess ? `المتبقي ساعتان. عدد الساعات خارج الرصيد: ${number(excess)}، بقيمة ${money(cost)} قبل الضريبة، بعد موافقة العميل.` : 'الطلب داخل الرصيد المتبقي في المثال. لا توجد إضافة مالية.';
     return { excess, cost };
   }
   ['extra-hours', 'extra-rate'].forEach(id => $(id).addEventListener('input', extra));
   $('copy-extra').addEventListener('click', () => {
     const result = extra();
     if (!result || !result.excess) { $('extra-status').textContent = result ? 'لا توجد ساعات إضافية تحتاج عرضًا.' : 'راجع مدخلات الساعات والسعر.'; return; }
-    copy(`مسودة عرض إضافة للمراجعة: الطلب الجديد يتجاوز رصيد الباقة بمقدار ${number(result.excess)} ساعات. المقابل المقترح ${money(result.cost)} قبل أي ضريبة منطبقة. نوضح تفاصيل النطاق والموعد ونعتمدها معكم قبل بدء العمل الإضافي. السداد لحساب المكتب مباشرة.`, 'extra-status');
+    copy(`مسودة عرض إضافة للمراجعة: عدد الساعات المتجاوزة لرصيد الباقة: ${number(result.excess)}. المقابل المقترح ${money(result.cost)} قبل أي ضريبة منطبقة. نوضح تفاصيل النطاق والموعد ونعتمدها معكم قبل بدء العمل الإضافي. السداد لحساب المكتب مباشرة.`, 'extra-status');
   });
   function economics() {
     if (!['job-margin', 'subscription', 'setup-fee'].every(id => $(id).value !== '' && $(id).checkValidity())) {
