@@ -63,7 +63,7 @@
             <h2 id="h1s" tabindex="-1">اختر نوع القضية</h2>
             <p class="hint" id="typeHint">اختر الأقرب لموضوعك.</p>
             <fieldset class="case-grid" id="caseTypes" aria-describedby="typeError"><legend class="sr-only">اختر نوع القضية</legend></fieldset>
-            <div id="serviceFields" hidden><label class="field" for="serviceChoice"><span>نوع الخدمة</span><select id="serviceChoice"><option value="">اختر الخدمة</option></select></label><p class="hint">الوكالة من مقر التوقيف للموقوف لدى مكافحة المخدرات أو الشرطة بمحافظة الدوادمي. تُنسق المتطلبات مع المكتب مباشرة.</p></div>
+            <div id="serviceFields" hidden><label class="field" for="serviceChoice"><span>نوع الخدمة</span><select id="serviceChoice"><option value="">اختر الخدمة</option></select></label><p class="hint" id="serviceDescription" aria-live="polite" hidden></p></div>
             <p class="error" id="typeError" role="alert"></p>
           </section>
 
@@ -172,6 +172,6 @@
     <button type="button" class="primary" data-close>إغلاق</button>
   </dialog>
 
-  <script>window.__OFFICE__=__OFFICE_CONFIG__;</script><script src="/platform/maqbil/client.js?v=3"></script>
+  <script>window.__OFFICE__=__OFFICE_CONFIG__;</script><script src="/platform/maqbil/client.js?v=4"></script>
 </body>
 </html>
