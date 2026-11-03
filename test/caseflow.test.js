@@ -18,6 +18,9 @@ test('office isolation, CSRF, review, duplicate prevention and persistent approv
  require('../src/caseflow')(app,{pool,query:pool.query,requireAuth:()=>((q,s,n)=>q.session.user?n():s.sendStatus(401)),requirePasswordChanged:(_q,_s,n)=>n(),requireCsrf:(q,s,n)=>q.get('x-csrf-token')==='test'?n():s.sendStatus(403),extract:async()=>{calls++;return{data:fixture(),model:'mock',usage:{input_tokens:1,output_tokens:1}}}});
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(async()=>{await new Promise(r=>server.close(r));await db.close()});const url='http://127.0.0.1:'+server.address().port+'/api/caseflow';
  const req=(route,office=1,options={})=>fetch(url+route,{...options,headers:{'x-office':String(office),'x-csrf-token':'test',...options.headers}});
+ assert.equal((await req('/interest',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({officeName:'مكتب تجريبي',contactName:'أحمد',phone:'0500000000',consent:false})})).status,400);
+ assert.equal((await req('/interest',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({officeName:'مكتب تجريبي',contactName:'أحمد',phone:'0500000000',consent:true})})).status,200);
+ assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM caseflow_interest')).rows[0].n,1);
  assert.equal((await fetch(url+'/workspace')).status,401);
  let body=new FormData();body.set('text',source);body.set('consent','true');body.set('publicExample','true');
  assert.equal((await req('/extract',1,{method:'POST',body,headers:{'x-csrf-token':'wrong'}})).status,403);
@@ -33,4 +36,14 @@ test('office isolation, CSRF, review, duplicate prevention and persistent approv
  const item=space.items[0];assert.equal((await req('/items/'+item.id+'/cancel',2,{method:'POST'})).status,404);
  assert.equal((await req('/items/'+item.id+'/cancel',1,{method:'POST'})).status,200);
  assert.equal((await(await req('/workspace')).json()).items[0].status,'cancelled');
+ const pdf=new FormData();pdf.set('file',new Blob([Buffer.from('%PDF-1.4\npublic sample')],{type:'application/pdf'}),'sample.pdf');pdf.set('consent','true');pdf.set('publicExample','true');pdf.set('text',source+' تحديث');
+ const second=await(await req('/extract',1,{method:'POST',body:pdf})).json();assert(second.hasOriginal);assert.equal(second.original,undefined);
+ assert.equal((await req('/documents/'+second.id+'/original',2)).status,404);
+ const original=await req('/documents/'+second.id+'/original',1);assert.equal(original.status,200);assert.equal(await original.text(),'%PDF-1.4\npublic sample');
+ const secondApproval=await req('/documents/'+second.id+'/approve',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({result:fixture(),reviewed:true,caseId:approved.ok?(await approved.json()).caseId:null,supersedes:[{newIndex:0,oldItemId:item.id}]})});assert.equal(secondApproval.status,409); // Cancelled items cannot be superseded.
+ const thirdBody=new FormData();thirdBody.set('text',source+' إشعار جديد');thirdBody.set('consent','true');thirdBody.set('publicExample','true');const third=await(await req('/extract',1,{method:'POST',body:thirdBody})).json();
+ const thirdApproval=await req('/documents/'+third.id+'/approve',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({result:fixture(),reviewed:true,caseId:space.cases[0].id})});assert.equal(thirdApproval.status,200);
+ const active=(await(await req('/workspace')).json()).items.find(x=>x.status==='proposed');assert(active);
+ const replacement=await req('/documents/'+second.id+'/approve',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({result:fixture(),reviewed:true,caseId:space.cases[0].id,supersedes:[{newIndex:0,oldItemId:active.id}]})});assert.equal(replacement.status,200);
+ const finalSpace=await(await req('/workspace')).json();assert.equal(finalSpace.items.find(x=>x.id===active.id).status,'cancelled');assert.equal(finalSpace.audit.filter(x=>x.action==='superseded').length,1);
 });

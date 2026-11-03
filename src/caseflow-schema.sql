@@ -23,3 +23,8 @@ CREATE TABLE IF NOT EXISTS caseflow_usage (
 );
 CREATE INDEX IF NOT EXISTS caseflow_usage_office_date ON caseflow_usage(office_id,created_at);
 CREATE INDEX IF NOT EXISTS caseflow_items_office ON caseflow_items(office_id,case_id);
+CREATE TABLE IF NOT EXISTS caseflow_interest (
+ id BIGSERIAL PRIMARY KEY, office_name TEXT NOT NULL, contact_name TEXT NOT NULL,
+ contact_phone TEXT NOT NULL, consent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ source TEXT NOT NULL DEFAULT 'brochure', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
