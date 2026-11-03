@@ -5,6 +5,8 @@ const code=params.get('code');
 if(code&&/^[a-f0-9]{64}$/i.test(code)){sessionStorage.setItem('caseflowTrialCode',code);history.replaceState(null,'',location.pathname)}
 const token=sessionStorage.getItem('caseflowTrialCode')||'';
 const node=(tag,value)=>{const x=document.createElement(tag);x.textContent=String(value??'');return x};
+const documentTypes={judgment:'حكم',hearing:'إشعار جلسة',appointment:'موعد',other:'مستند آخر'};
+const calendars={gregorian:'ميلادي',hijri:'هجري',unknown:'تقويم غير محدد'};
 let csrf='';
 async function request(path,options={}){
   const response=await fetch('/api/caseflow/trial'+path,{...options,headers:{authorization:'Bearer '+token,'x-csrf-token':csrf,...options.headers},cache:'no-store'});
@@ -15,12 +17,12 @@ async function request(path,options={}){
 function renderItems(id,items){
   const box=$(id);box.replaceChildren();
   if(!items?.length){box.append(node('p','لا توجد عناصر مستخرجة.'));return}
-  for(const item of items){const article=node('article','');article.className='trial-item';article.append(node('strong',item.title||'عنصر غير مسمى'),node('p',[item.date,item.time,item.calendar].filter(Boolean).join(' · ')),node('blockquote',`صفحة ${item.page}: ${item.evidence||'لا يوجد دليل واضح'}`));box.append(article)}
+  for(const item of items){const article=node('article','');article.className='trial-item';article.append(node('strong',item.title||'عنصر غير مسمى'),node('p',[item.date,item.time,calendars[item.calendar]||'تقويم غير محدد'].filter(Boolean).join(' · ')),node('blockquote',`صفحة ${item.page}: ${item.evidence||'لا يوجد دليل واضح'}`));box.append(article)}
 }
 function render(data){
   $('trial-result').hidden=false;
   const fields=$('trial-fields');fields.replaceChildren();
-  for(const [label,field] of [['نوع المستند',{value:data.documentType}],['رقم القضية',data.caseNumber],['المحكمة',data.court],['السنة',data.caseYear]]){
+  for(const [label,field] of [['نوع المستند',{value:documentTypes[data.documentType]||'غير محدد'}],['رقم القضية',data.caseNumber],['المحكمة',data.court],['السنة',data.caseYear]]){
     const article=node('article','');article.className='trial-item';article.append(node('strong',label),node('p',field?.value||'غير واضح'));
     if(field?.evidence)article.append(node('blockquote',`صفحة ${field.page}: ${field.evidence}`));fields.append(article);
   }
