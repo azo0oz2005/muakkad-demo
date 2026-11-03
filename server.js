@@ -276,6 +276,7 @@ app.use(['/api/dashboard', '/api/admin', '/api/workspace'], (req, res, next) => 
 
 require('./src/maqbil')(app, {pool, loadOffice, safeOffice, submitLimiter});
 require('./src/workspace')(app,{ pool,query,loadOffice,safeOffice,requireAuth,requireCsrf,submitLimiter });
+require('./src/caseflow')(app,{ pool,query,requireAuth,requireCsrf,requirePasswordChanged });
 app.use('/api/public/:slug',async(req,res,next)=>{
   if (req.method !== 'GET' && ['/start','/progress','/submit'].includes(req.path)) {
     const office=await loadOffice(req.params.slug);

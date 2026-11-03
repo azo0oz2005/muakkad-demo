@@ -118,6 +118,7 @@ async function migrateWithRetry(maxAttempts = 12) {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       await pool.query(sql);
+      await pool.query(require('fs').readFileSync(require('path').join(__dirname, '../src/caseflow-schema.sql'), 'utf8'));
       return;
     } catch (error) {
       const retryable = ['ECONNREFUSED', 'ETIMEDOUT', 'ENETUNREACH'].includes(error.code);
