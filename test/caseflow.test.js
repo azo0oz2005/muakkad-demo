@@ -47,3 +47,25 @@ test('office isolation, CSRF, review, duplicate prevention and persistent approv
  const replacement=await req('/documents/'+second.id+'/approve',1,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({result:fixture(),reviewed:true,caseId:space.cases[0].id,supersedes:[{newIndex:0,oldItemId:active.id}]})});assert.equal(replacement.status,200);
  const finalSpace=await(await req('/workspace')).json();assert.equal(finalSpace.items.find(x=>x.id===active.id).status,'cancelled');assert.equal(finalSpace.audit.filter(x=>x.action==='superseded').length,1);
 });
+test('private trial link allows 20 extracts per Riyadh day without storing documents',async t=>{
+ const express=require('express'),fs=require('fs'),path=require('path'),{PGlite}=require('@electric-sql/pglite');const db=new PGlite();
+ await db.exec('CREATE TABLE offices(id BIGINT PRIMARY KEY);CREATE TABLE users(id BIGINT PRIMARY KEY);INSERT INTO offices VALUES(1);INSERT INTO users VALUES(1);');await db.exec(fs.readFileSync(path.join(__dirname,'../src/caseflow-schema.sql'),'utf8'));
+ process.env.CASEFLOW_ENABLED='true';let calls=0;const pool={query:(s,p)=>db.query(s,p)};
+ const app=express();app.use(express.json());app.use((req,_res,next)=>{req.session={user:req.get('x-admin')?{id:1,role:'owner_admin'}:null};next()});
+ require('../src/caseflow-trial')(app,{pool,query:pool.query,requireAuth:role=>(req,res,next)=>req.session.user&&(!role||req.session.user.role===role)?next():res.sendStatus(401),requirePasswordChanged:(_req,_res,next)=>next(),requireCsrf:(req,res,next)=>req.get('x-csrf-token')==='test'?next():res.sendStatus(403),extract:async()=>{calls++;return{data:fixture()}}});
+ const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(async()=>{await new Promise(r=>server.close(r));await db.close()});const base='http://127.0.0.1:'+server.address().port;
+ const created=await fetch(base+'/api/admin/caseflow-trial-invites',{method:'POST',headers:{'x-admin':'1','x-csrf-token':'test','content-type':'application/json'},body:JSON.stringify({label:'محامٍ للتجربة'})});assert.equal(created.status,201);const invite=await created.json(),token=new URL(invite.url,'http://local').searchParams.get('code');assert.equal(token.length,64);
+ const headers={authorization:'Bearer '+token,'x-csrf-token':'test'};
+ const form=()=>{const body=new FormData();body.set('text',source);body.set('consent','true');body.set('deidentified','true');return body};
+ assert.equal((await fetch(base+'/api/caseflow/trial/status',{headers:{authorization:'Bearer invalid'}})).status,401);
+ assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers:{authorization:'Bearer '+token,'x-csrf-token':'wrong'},body:form()})).status,403);
+ const invalid=form();invalid.set('deidentified','false');assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:invalid})).status,400);
+ for(let n=0;n<20;n++){const response=await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:form()});assert.equal(response.status,200);assert.equal((await response.json()).remaining,19-n)}
+ assert.equal(calls,20);assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:form()})).status,429);
+ assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM caseflow_documents')).rows[0].n,0);
+ assert.equal((await(await fetch(base+'/api/caseflow/trial/status',{headers})).json()).remaining,0);
+ await db.query("UPDATE caseflow_trial_usage SET usage_day=usage_day-INTERVAL '1 day' WHERE invite_id=$1",[invite.id]);
+ assert.equal((await(await fetch(base+'/api/caseflow/trial/status',{headers})).json()).remaining,20);
+ const revoked=await fetch(base+'/api/admin/caseflow-trial-invites/'+invite.id+'/revoke',{method:'POST',headers:{'x-admin':'1','x-csrf-token':'test'}});assert.equal(revoked.status,200);
+ assert.equal((await fetch(base+'/api/caseflow/trial/status',{headers})).status,401);
+});

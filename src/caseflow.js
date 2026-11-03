@@ -6,6 +6,7 @@ const {rateLimit}=require('express-rate-limit');
 const {extractDocument,encrypt,decrypt,normalize,caseKey,validateExtraction}=require('./caseflow-extract');
 
 module.exports=function mountCaseflow(app,{pool,query,requireAuth,requireCsrf,requirePasswordChanged,extract=extractDocument}) {
+  require('./caseflow-trial')(app,{pool,query,requireAuth,requireCsrf,requirePasswordChanged,extract});
   const enabled=(_req,res,next)=>process.env.CASEFLOW_ENABLED==='true'?next():res.status(503).json({error:'مساحة الملفات لم تُفعّل لهذا الخادم بعد.'});
   const scoped=(req,res,next)=>{
     if(req.session.user.role!=='lawyer'||!req.session.user.officeId) return res.status(403).json({error:'هذه المساحة خاصة بحساب محامي مرتبط بمكتب.'});
@@ -56,7 +57,7 @@ module.exports=function mountCaseflow(app,{pool,query,requireAuth,requireCsrf,re
       const db=await pool.connect();
       try{
         await db.query('BEGIN');await db.query('SELECT id FROM offices WHERE id=$1 FOR UPDATE',[req.caseflowOffice]);
-        const count=await db.query("SELECT COUNT(*)::integer AS n FROM caseflow_usage WHERE office_id=$1 AND created_at>NOW()-INTERVAL '1 day'",[req.caseflowOffice]);
+        const count=await db.query("SELECT COUNT(*)::integer AS n FROM caseflow_usage WHERE office_id=$1 AND (created_at AT TIME ZONE 'Asia/Riyadh')::date=(NOW() AT TIME ZONE 'Asia/Riyadh')::date",[req.caseflowOffice]);
         if(count.rows[0].n>=Number(process.env.CASEFLOW_DAILY_LIMIT||20)){await db.query('ROLLBACK');return res.status(429).json({error:'وصل المكتب إلى حد التجربة اليومي.'})}
         await db.query('INSERT INTO caseflow_usage(office_id) VALUES($1)',[req.caseflowOffice]);await db.query('COMMIT');
       }catch(e){await db.query('ROLLBACK');throw e}finally{db.release()}
