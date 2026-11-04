@@ -58,10 +58,10 @@ test('private trial link allows 20 extracts per Riyadh day without storing docum
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(async()=>{await new Promise(r=>server.close(r));await db.close()});const base='http://127.0.0.1:'+server.address().port;
  const created=await fetch(base+'/api/admin/caseflow-trial-invites',{method:'POST',headers:{'x-admin':'1','x-csrf-token':'test','content-type':'application/json'},body:JSON.stringify({label:'محامٍ للتجربة'})});assert.equal(created.status,201);const invite=await created.json(),token=new URL(invite.url,'http://local').searchParams.get('code');assert.equal(token.length,64);
  const headers={authorization:'Bearer '+token,'x-csrf-token':'test'};
- const form=()=>{const body=new FormData();body.set('text',source);body.set('consent','true');body.set('deidentified','true');return body};
+ const form=()=>{const body=new FormData();body.set('text',source);body.set('process','true');return body};
  assert.equal((await fetch(base+'/api/caseflow/trial/status',{headers:{authorization:'Bearer invalid'}})).status,401);
  assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers:{authorization:'Bearer '+token,'x-csrf-token':'wrong'},body:form()})).status,403);
- const invalid=form();invalid.set('deidentified','false');assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:invalid})).status,400);
+ const invalid=form();invalid.set('process','false');assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:invalid})).status,400);
  for(let n=0;n<20;n++){const response=await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:form()});assert.equal(response.status,200);assert.equal((await response.json()).remaining,19-n)}
  assert.equal(calls,20);assert.equal((await fetch(base+'/api/caseflow/trial/extract',{method:'POST',headers,body:form()})).status,429);
  assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM caseflow_documents')).rows[0].n,0);

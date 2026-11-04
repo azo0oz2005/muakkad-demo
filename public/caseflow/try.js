@@ -34,9 +34,9 @@ function render(data){
 $('trial-form').addEventListener('submit',async event=>{
   event.preventDefault();const button=$('trial-submit');button.disabled=true;$('trial-message').textContent='جارٍ قراءة المستند…';$('trial-result').hidden=true;
   try{
-    const form=new FormData();form.set('text',$('trial-text').value);form.set('consent',String($('trial-consent').checked));form.set('deidentified',String($('trial-consent').checked));if($('trial-file').files[0])form.set('file',$('trial-file').files[0]);
-    const result=await request('/extract',{method:'POST',body:form});render(result.result);$('trial-state').textContent=`المتبقي اليوم: ${result.remaining} من 20. يتجدد الرصيد عند منتصف الليل بتوقيت الرياض.`;$('trial-message').textContent='اكتمل الاستخراج. راجع الأدلة قبل استخدام أي معلومة.';
-  }catch(error){$('trial-message').textContent=error.message;try{const status=await request('/status');$('trial-state').textContent=`المتبقي اليوم: ${status.remaining} من 20. يتجدد الرصيد عند منتصف الليل بتوقيت الرياض.`}catch{}}
+    const form=new FormData();form.set('text',$('trial-text').value);form.set('process','true');if($('trial-file').files[0])form.set('file',$('trial-file').files[0]);
+    const result=await request('/extract',{method:'POST',body:form});render(result.result);$('trial-message').textContent='اكتمل الاستخراج. راجع الأدلة قبل استخدام أي معلومة.';
+  }catch(error){$('trial-message').textContent=error.message}
   finally{button.disabled=false}
 });
-(async()=>{try{if(!token)throw Error('الرابط غير صالح. اطلب رابط تجربة خاصًا من مؤكد.');const response=await fetch('/api/csrf');csrf=(await response.json()).token;const status=await request('/status');$('trial-state').textContent=`المتبقي اليوم: ${status.remaining} من 20. يتجدد الرصيد عند منتصف الليل بتوقيت الرياض.`;$('trial-work').hidden=false}catch(error){$('trial-state').textContent=error.message}})();
+(async()=>{try{if(!token)throw Error('الرابط غير صالح. اطلب رابطًا جديدًا من مؤكد.');const response=await fetch('/api/csrf');csrf=(await response.json()).token;await request('/status');$('trial-state').hidden=true;$('trial-work').hidden=false}catch(error){$('trial-state').textContent=error.message;$('trial-state').hidden=false}})();

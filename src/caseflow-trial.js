@@ -18,7 +18,7 @@ const validFile=file=>{
 
 module.exports=function mountCaseflowTrial(app,{pool,query,requireAuth,requirePasswordChanged,requireCsrf,extract=extractDocument}){
   const base='/api/caseflow/trial';
-  const upload=multer({storage:multer.memoryStorage(),limits:{fileSize:5*1024*1024,files:1,fields:3,fieldSize:60000},fileFilter:(_req,file,cb)=>cb(null,['application/pdf','image/png','image/jpeg','image/webp'].includes(file.mimetype))}).single('file');
+  const upload=multer({storage:multer.memoryStorage(),limits:{fileSize:5*1024*1024,files:1,fields:2,fieldSize:60000},fileFilter:(_req,file,cb)=>cb(null,['application/pdf','image/png','image/jpeg','image/webp'].includes(file.mimetype))}).single('file');
   const limiter=rateLimit({windowMs:60*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false});
   const tokenFrom=req=>String(req.get('authorization')||'').match(/^Bearer ([a-f0-9]{64})$/i)?.[1]||'';
   const invite=async req=>{
@@ -55,7 +55,7 @@ module.exports=function mountCaseflowTrial(app,{pool,query,requireAuth,requirePa
   app.post(`${base}/extract`,disabled,limiter,requireCsrf,(req,res,next)=>upload(req,res,error=>error?res.status(400).json({error:'الملف غير مقبول. استخدم PDF أو صورة حتى 5 ميغابايت.'}):next()),async(req,res)=>{
     try{
       const row=await invite(req);if(!row)return res.status(401).json({error:'رابط التجربة غير صالح أو انتهت صلاحيته.'});
-      if(req.body.consent!=='true'||req.body.deidentified!=='true')return res.status(400).json({error:'أكّد إزالة بيانات الأشخاص والإذن بإرسال المستند إلى Claude.'});
+      if(req.body.process!=='true')return res.status(400).json({error:'أرسل المستند من صفحة التجربة.'});
       const text=String(req.body.text||'').trim(),file=req.file;
       if((!file&&text.length<10)||text.length>40000)return res.status(400).json({error:'أرفق ملفًا أو نصًا بين 10 و40000 حرف.'});
       if(file&&!validFile(file))return res.status(400).json({error:'محتوى الملف لا يطابق نوعه.'});
